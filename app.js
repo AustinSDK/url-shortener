@@ -198,7 +198,7 @@ app.get("/dashboard/stats", (req, res, next) => {
         "Most Popular URL": "abc123",
         "URLs Created Today": 12
     };
-    res.render("dashboard/stats.ejs", { stats });
+    res.render("dashboard/stats.ejs", { stats,user:req.user });
 });
 
 // listen

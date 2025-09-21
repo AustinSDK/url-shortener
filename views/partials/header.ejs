@@ -1,3 +1,8 @@
 <div id="header">
-    lol
+    <nav>
+        <a href="/dashboard/stats">Dashboard</a>
+        <% if (user.permissions.includes("admin") || user.permissions.includes("url-admin")) { %>
+            <a href="/admin">Admin</a>
+        <% } %>
+    </nav>
 </div>
