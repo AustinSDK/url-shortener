@@ -1,0 +1,28 @@
+{
+  "name": "us",
+  "version": "1.0.0",
+  "description": "a cool url shortener",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Null-Austin-Industries/url-shortener.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Null-Austin-Industries/url-shortener/issues"
+  },
+  "homepage": "https://github.com/Null-Austin-Industries/url-shortener#readme",
+  "dependencies": {
+    "@austinsdk/auth": "^1.1.1",
+    "better-sqlite3": "^12.2.0",
+    "cookie-parser": "^1.4.7",
+    "ejs": "^3.1.10",
+    "express": "^5.1.0",
+    "sqlite3": "^5.1.7"
+  }
+}
