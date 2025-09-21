@@ -13,26 +13,16 @@
     <%- include("partials/sidebar.ejs") %>
     <div id="main">
         <div id="stats">
-            <div id="stat-container-1" class="stat-container">
-                <h3 class="stat-name">
-                    this is a stat name
-                </h3>
-            </div>
-            <div id="stat-container-2" class="stat-container">
-                <h3 class="stat-name">
-                    this is a stat name
-                </h3>
-            </div>
-            <div id="stat-container-3" class="stat-container">
-                <h3 class="stat-name">
-                    this is a stat name
-                </h3>
-            </div>
-            <div id="stat-container-4" class="stat-container">
-                <h3 class="stat-name">
-                    this is a stat name
-                </h3>
-            </div>
+            <% Object.entries(stats).forEach(([key, value], idx) => { %>
+                <div id="stat-container-<%= idx + 1 %>" class="stat-container">
+                    <h3 class="stat-name">
+                        <%= key %>
+                    </h3>
+                    <p class="stat-info">
+                        <%= value %>
+                    </p>
+                </div>
+            <% }); %>
         </div>
     </div>
 </body>

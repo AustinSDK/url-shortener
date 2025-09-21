@@ -189,9 +189,17 @@ app.get("/dashboard/:db",(req,res,next)=>{
     }
     return next();
 })
-app.get("/dashboard/stats",(req,res,next)=>{
-    return res.render("dashboard/stats.ejs")
-})
+app.get("/dashboard/stats", (req, res, next) => {
+    const stats = {
+        "Total Shortened URLs": 1234,
+        "Total Redirects": 5678,
+        "Active Users": 42,
+        "Unique Visitors": 314,
+        "Most Popular URL": "abc123",
+        "URLs Created Today": 12
+    };
+    res.render("dashboard/stats.ejs", { stats });
+});
 
 // listen
 
