@@ -13,6 +13,7 @@ module.exports = class{
             );
             CREATE TABLE IF NOT EXISTS cookies (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
+                cookie TEXT NOT NULL UNIQUE,
                 connection INTEGER NOT NULL,
                 FOREIGN KEY (connection) REFERENCES tokens (id)
             );
