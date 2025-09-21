@@ -54,7 +54,7 @@
     }
 }
 .link-name{
-    text-transform: capitalize;
+    text-transform: uppercase;
 }
 #links > *{
     text-decoration: none;
