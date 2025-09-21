@@ -1,10 +1,18 @@
+function randomString(size) {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let result = '';
+    for (let i = 0; i < size; i++) {
+        result += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return result;
+}
 const sqlite3 = require("better-sqlite3");
 module.exports = class{
     init(){
         this.db.exec(`
             PRAGMA foreign_keys = ON;
             CREATE TABLE IF NOT EXISTS short_urls (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                id TEXT PRIMARY KEY,
                 short TEXT UNIQUE NOT NULL,
                 url TEXT NOT NULL,
                 created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -36,7 +44,7 @@ module.exports = class{
         return this.shortens[short]
     }
     addShort(slug,url,username,warning){
-        const result = this.db.prepare(`INSERT INTO short_urls (short,url,warning,username) VALUES (?,?,?,?)`).run(slug,url,warning,username);
+        const result = this.db.prepare(`INSERT INTO short_urls (id, short,url,warning,username) VALUES (?,?,?,?,?)`).run(randomString(64),slug,url,warning ? 1 : 0,username);
         
         // Add to cache
         this.shortens[slug] = {
