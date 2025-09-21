@@ -23,15 +23,101 @@ const auth = new Auth(
     process.env.callback
 )
 
+// User cache system (similar to db.js pattern)
+const userCache = {
+    users: {}, // cached user data by token
+    invalidTokens: [], // tokens that returned null/error
+    CACHE_DURATION: 5 * 60 * 1000, // 5 minutes
+    
+    get(token) {
+        // Check if token is known to be invalid
+        if (this.invalidTokens.includes(token)) {
+            return { valid: false, user: null };
+        }
+        
+        // Check if we have cached user data
+        const cached = this.users[token];
+        if (cached) {
+            // Check if cache is still valid
+            if (Date.now() - cached.timestamp < this.CACHE_DURATION) {
+                return { valid: true, user: cached.user };
+            } else {
+                // Cache expired, remove it
+                delete this.users[token];
+            }
+        }
+        
+        return null; // No cache data
+    },
+    
+    set(token, user) {
+        if (user) {
+            // Cache valid user data
+            this.users[token] = {
+                user: user,
+                timestamp: Date.now()
+            };
+            // Remove from invalid tokens if it was there
+            const index = this.invalidTokens.indexOf(token);
+            if (index > -1) {
+                this.invalidTokens.splice(index, 1);
+            }
+        } else {
+            // Mark token as invalid (but don't cache indefinitely)
+            if (!this.invalidTokens.includes(token)) {
+                this.invalidTokens.push(token);
+            }
+            // Clean up old invalid tokens periodically (keep only last 100)
+            if (this.invalidTokens.length > 100) {
+                this.invalidTokens = this.invalidTokens.slice(-50);
+            }
+        }
+    },
+    
+    clear(token) {
+        delete this.users[token];
+        const index = this.invalidTokens.indexOf(token);
+        if (index > -1) {
+            this.invalidTokens.splice(index, 1);
+        }
+    }
+};
+
 // setup
 
 let app = express();
 app.use(cookieParser());
+app.use(async (req,res,next)=>{
+    if (!req.cookies || !req.cookies.token){
+        return next();
+    }
+    
+    const token = req.cookies.token;
+    
+    // Try to get user from cache first
+    const cachedResult = userCache.get(token);
+    if (cachedResult !== null) {
+        req.user = cachedResult.user;
+        return next();
+    }
+    
+    // Not in cache, fetch from API
+    try{
+        req.user = await auth.getUserInfo(token);
+        // Cache the result (whether it's a user object or null/undefined)
+        userCache.set(token, req.user);
+    } catch (e){
+        console.error(e);
+        // Cache the error result as null
+        userCache.set(token, null);
+    }
+    next();
+})
 
 // epic (static) endpoints
 
 app.get("/",(req,res,next)=>{
-    res.send("hiii")
+    res.send(JSON.stringify(req.user))
 })
 app.get("/css/:path",(req,res,next)=>{
     let f_path = path.join(__dirname,"assets","css");
