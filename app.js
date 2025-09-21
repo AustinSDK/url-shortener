@@ -48,6 +48,16 @@ app.get("/js/:path",(req,res,next)=>{
     }
     return res.sendFile(_path)
 })
+app.get("/u/:short",(req,res,next)=>{
+    let _short = db.getShort(req.params.short);
+    if (!_short){
+        return res.send("invalid url")
+    }
+    if (_short.warning === 1){
+        return res.send("extra check")
+    }
+    res.redirect(_short.url)
+})
 
 // listen
 
