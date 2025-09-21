@@ -82,4 +82,7 @@ module.exports = class{
             }
         }
     }
+    getShortsByUsername(username){
+        return this.db.prepare(`SELECT * FROM short_urls WHERE username = ?`).all(username)
+    }
 }
