@@ -35,4 +35,51 @@ module.exports = class{
         if (this.ns[short]) return false;
         return this.shortens[short]
     }
+    addShort(slug,url,username,warning){
+        const result = this.db.prepare(`INSERT INTO short_urls (short,url,warning,username) VALUES (?,?,?,?)`).run(slug,url,warning,username);
+        
+        // Add to cache
+        this.shortens[slug] = {
+            id: result.lastInsertRowid,
+            short: slug,
+            url: url,
+            warning: warning,
+            username: username,
+            created_at: new Date().toISOString()
+        };
+        
+        // Remove from "not found" cache if it was there
+        const nsIndex = this.ns.indexOf(slug);
+        if (nsIndex > -1) {
+            this.ns.splice(nsIndex, 1);
+        }
+    }
+    removeShort(id){
+        // First get the short URL to remove from cache
+        const record = this.db.prepare(`SELECT short FROM short_urls WHERE id = ?`).get(id);
+        this.db.prepare(`DELETE FROM short_urls WHERE id = ?`).run(id);
+        
+        // Clear from cache
+        if (record && record.short) {
+            delete this.shortens[record.short];
+            const nsIndex = this.ns.indexOf(record.short);
+            if (nsIndex > -1) {
+                this.ns.splice(nsIndex, 1);
+            }
+        }
+    }
+    modifyShort(id,slug,url,username,warning){
+        // First get the old short URL to remove from cache
+        const oldRecord = this.db.prepare(`SELECT short FROM short_urls WHERE id = ?`).get(id);
+        this.db.prepare(`UPDATE short_urls SET short = ?, url = ?, username = ?, warning = ? WHERE id = ?`).run(slug,url,username,warning,id);
+        
+        // Clear old cache entries
+        if (oldRecord && oldRecord.short) {
+            delete this.shortens[oldRecord.short];
+            const nsIndex = this.ns.indexOf(oldRecord.short);
+            if (nsIndex > -1) {
+                this.ns.splice(nsIndex, 1);
+            }
+        }
+    }
 }
