@@ -203,14 +203,7 @@ app.get("/dashboard/stats", (req, res, next) => {
     res.render("dashboard/stats.ejs", { stats,user:req.user, test:test });
 });
 app.get("/dashboard/links", (req, res, next) => {
-    const links = [
-        {
-            "id":0,
-            "short":"epic_awesome_sauce",
-            "url":"https://google.com",
-            "created_at":"2025-09-21 22:44:33"
-        }
-    ]
+    const links = db.getShortsByUsername(req.user.username)
     res.render("dashboard/links.ejs", { links:links,user:req.user, test:test });
 });
 if (test){
