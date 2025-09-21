@@ -200,6 +200,17 @@ app.get("/dashboard/stats", (req, res, next) => {
     };
     res.render("dashboard/stats.ejs", { stats,user:req.user });
 });
+app.get("/dashboard/links", (req, res, next) => {
+    const stats = {
+        "Total Shortened URLs": 1234,
+        "Total Redirects": 5678,
+        "Active Users": 42,
+        "Unique Visitors": 314,
+        "Most Popular URL": "abc123",
+        "URLs Created Today": 12
+    };
+    res.render("dashboard/links.ejs", { stats,user:req.user });
+});
 
 // listen
 

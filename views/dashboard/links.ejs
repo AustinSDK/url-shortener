@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Links</title>
+    <link rel="stylesheet" href="/css/colors.css">
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/dashboard.css">
+    <link rel="stylesheet" href="/css/links.css">
+</head>
+<body>
+    <%- include("../partials/header.ejs",{user:user}) %>
+    <div class="dashboard-container">
+        <%- include("partials/sidebar.ejs") %>
+        <div id="main">
+            <div id="links">
+                <% Object.entries(stats).forEach(([key, value], idx) => { %>
+                    <div id="link-container-<%= idx + 1 %>" class="link-container">
+                        <h3 class="link-name">
+                            <%= key %>
+                        </h3>
+                        <p class="link-info">
+                            <%= value %>
+                        </p>
+                    </div>
+                <% }); %>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
