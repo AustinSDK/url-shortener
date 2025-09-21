@@ -4,5 +4,8 @@
         <% if (user.permissions.includes("admin") || user.permissions.includes("url-admin")) { %>
             <a href="/admin">Admin</a>
         <% } %>
+        <% if (test) { %>
+            <a href="/me">me</a>
+        <% } %>
     </nav>
 </div>

@@ -10,10 +10,11 @@
     <link rel="stylesheet" href="/css/stats.css">
 </head>
 <body>
-    <%- include("../partials/header.ejs",{user:user}) %>
+    <%- include("../partials/header.ejs",{user:user, test:test}) %>
     <div class="dashboard-container">
         <%- include("partials/sidebar.ejs") %>
         <div id="main">
+            <h1>Stats</h1>
             <div id="stats">
                 <% Object.entries(stats).forEach(([key, value], idx) => { %>
                     <div id="stat-container-<%= idx + 1 %>" class="stat-container">

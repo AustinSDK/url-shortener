@@ -56,3 +56,13 @@
 .link-name{
     text-transform: capitalize;
 }
+#links > *{
+    text-decoration: none;
+}
+.link-info > .link{
+    text-decoration: underline;
+}
+.link-info> .date, 
+.link-info > .link{
+    color: var(--text1-muted);
+}

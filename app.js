@@ -11,6 +11,8 @@ const colors = require("colors");
 const path = require("path");
 const fs = require("fs");
 
+let test = process.argv.includes("-t");
+
 let db = require("./db");
 db = new db(path.join(__dirname,"site.db"));
 
@@ -198,19 +200,24 @@ app.get("/dashboard/stats", (req, res, next) => {
         "Most Popular URL": "abc123",
         "URLs Created Today": 12
     };
-    res.render("dashboard/stats.ejs", { stats,user:req.user });
+    res.render("dashboard/stats.ejs", { stats,user:req.user, test:test });
 });
 app.get("/dashboard/links", (req, res, next) => {
-    const stats = {
-        "Total Shortened URLs": 1234,
-        "Total Redirects": 5678,
-        "Active Users": 42,
-        "Unique Visitors": 314,
-        "Most Popular URL": "abc123",
-        "URLs Created Today": 12
-    };
-    res.render("dashboard/links.ejs", { stats,user:req.user });
+    const links = [
+        {
+            "id":0,
+            "short":"epic_awesome_sauce",
+            "url":"https://google.com",
+            "created_at":"2025-09-21 22:44:33"
+        }
+    ]
+    res.render("dashboard/links.ejs", { links:links,user:req.user, test:test });
 });
+if (test){
+    app.get("/me",(req,res,next)=>{
+        res.json(req.user)
+    })
+}
 
 // listen
 

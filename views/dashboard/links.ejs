@@ -10,21 +10,25 @@
     <link rel="stylesheet" href="/css/links.css">
 </head>
 <body>
-    <%- include("../partials/header.ejs",{user:user}) %>
+    <%- include("../partials/header.ejs",{user:user, test:test}) %>
     <div class="dashboard-container">
         <%- include("partials/sidebar.ejs") %>
         <div id="main">
+            <h1>Links</h1>
             <div id="links">
-                <% Object.entries(stats).forEach(([key, value], idx) => { %>
-                    <div id="link-container-<%= idx + 1 %>" class="link-container">
-                        <h3 class="link-name">
-                            <%= key %>
-                        </h3>
-                        <p class="link-info">
-                            <%= value %>
-                        </p>
-                    </div>
-                <% }); %>
+                <% links.forEach(link => { %>
+                    <a href="/dashboard/links/<%= link.id %>">
+                        <div class="link-container">
+                            <h3 class="link-name">
+                                <%= link.short %>
+                            </h3>
+                            <p class="link-info">
+                                <span class="link"><%= link.url %></span><br>
+                                <span class="date"><%= String(link.created_at).split(" ")[0] %></span>
+                            </p>
+                        </div>
+                    </a>
+                <% }) %>
             </div>
         </div>
     </div>
