@@ -117,7 +117,7 @@ app.use(async (req,res,next)=>{
 // epic (static) endpoints
 
 app.get("/",(req,res,next)=>{
-    res.send(JSON.stringify(req.user))
+    res.render("index.ejs")
 })
 app.get("/css/:path",(req,res,next)=>{
     let f_path = path.join(__dirname,"assets","css");
