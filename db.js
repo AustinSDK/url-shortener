@@ -2,6 +2,7 @@ const sqlite3 = require("better-sqlite3");
 module.exports = class{
     init(){
         this.db.exec(`
+            PRAGMA foreign_keys = ON;
             CREATE TABLE IF NOT EXISTS short_urls (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 short TEXT UNIQUE NOT NULL,
@@ -9,6 +10,15 @@ module.exports = class{
                 created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
                 warning BOOLEAN NOT NULL DEFAULT false,
                 username TEXT NOT NULL DEFAULT "no-name"
+            );
+            CREATE TABLE IF NOT EXISTS cookies (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                connection INTEGER NOT NULL,
+                FOREIGN KEY (connection) REFERENCES tokens (id)
+            );
+            CREATE TABLE IF NOT EXISTS tokens (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                token TEXT NOT NULL UNIQUE
             );
         `);
     }
