@@ -1,0 +1,15 @@
+:root {
+    --background1: #12091a;           /* very dark purple */
+    --background1-border: #2e1a40;    /* higher contrast purple border */
+    --background2: #180c22;           /* even darker purple */
+    --background2-border: #3a2055;    /* higher contrast purple border */
+    --background3: #1e1130;           /* darkest purple */
+    --background3-border: #462a6b;    /* highest contrast purple border */
+    --text1: #c7a6ff;                 /* soft light purple */
+    --text1-muted: #8e7bbf;           /* muted light purple */
+    --text2: #ffd6e0;                 /* pale pink */
+    --text2-muted: #bfa6b0;           /* muted pale pink */
+    --rust1: #b7410e;                 /* classic rust */
+    --rust2: #a63c06;                 /* deeper rust */
+    --rust3: #d2691e;                 /* lighter rust */
+}

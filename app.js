@@ -89,6 +89,7 @@ let app = express();
 app.use(cookieParser());
 app.use(async (req,res,next)=>{
     if (!req.cookies || !req.cookies.token){
+        req.user = false;
         return next();
     }
     
@@ -104,6 +105,9 @@ app.use(async (req,res,next)=>{
     // Not in cache, fetch from API
     try{
         req.user = await auth.getUserInfo(token);
+        if (req.user.status == "error"){
+            req.user = false;
+        }
         // Cache the result (whether it's a user object or null/undefined)
         userCache.set(token, req.user);
     } catch (e){
@@ -117,7 +121,10 @@ app.use(async (req,res,next)=>{
 // epic (static) endpoints
 
 app.get("/",(req,res,next)=>{
-    res.render("index.ejs",{user:req.user})
+    if (!req.user){
+        return res.redirect("/login")
+    }
+    return res.redirect("/dashboard/stats")
 })
 app.get("/css/:path",(req,res,next)=>{
     let f_path = path.join(__dirname,"assets","css");
@@ -173,6 +180,17 @@ app.get("/callback/auth",async (req,res,next)=>{
         console.log('Oops, something went wrong:', error);
         res.send(error,":(")
     }
+})
+
+// cool dashboard stuff
+app.get("/dashboard/:db",(req,res,next)=>{
+    if (!req.user){
+        return res.redirect("/login");
+    }
+    return next();
+})
+app.get("/dashboard/stats",(req,res,next)=>{
+    return res.render("dashboard/stats.ejs")
 })
 
 // listen

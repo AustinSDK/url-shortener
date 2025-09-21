@@ -1,0 +1,12 @@
+@import url(https://fonts.googleapis.com/css?family=Montserrat:100,200,300,regular,500,600,700,800,900,100italic,200italic,300italic,italic,500italic,600italic,700italic,800italic,900italic);
+body,html{
+    background-color: var(--background1);
+    color: var(--text2);
+    font-family: "Montserrat", sans-serif;
+}
+div#main{
+    background-color: var(--background2);
+    padding: 5px;
+    border: 1px var(--background1-border) solid;
+    border-radius: 5px;
+}
