@@ -9,14 +9,30 @@ const sqlite3 = require("sqlite3");
 
 const colors = require("colors");
 
+const path = require("path");
+const fs = require("fs");
+
 // setup
 
 let app = express();
 
-// epic endpoints
+// epic (static) endpoints
 
 app.get("/",(req,res,next)=>{
     res.send("hiii")
+})
+app.get("/css/:path",(req,res,next)=>{
+    let f_path = path.join(__dirname,"assets","css");
+    let _path = path.join(f_path,req.params.path);
+    if (!path.normalize(_path).startsWith(f_path)){
+        return res.status(403).json(
+            {
+                "type":"error",
+                "error":"Invalid url D:"
+            }
+        )
+    }
+    return res.sendFile(_path)
 })
 
 // listen
