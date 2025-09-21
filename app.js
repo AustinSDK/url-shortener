@@ -34,6 +34,19 @@ app.get("/css/:path",(req,res,next)=>{
     }
     return res.sendFile(_path)
 })
+app.get("/js/:path",(req,res,next)=>{
+    let f_path = path.join(__dirname,"assets","js");
+    let _path = path.join(f_path,req.params.path);
+    if (!path.normalize(_path).startsWith(f_path)){
+        return res.status(403).json(
+            {
+                "type":"error",
+                "error":"Invalid url D:"
+            }
+        )
+    }
+    return res.sendFile(_path)
+})
 
 // listen
 
