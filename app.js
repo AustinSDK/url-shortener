@@ -5,12 +5,13 @@ require("dotenv").config();
 const express = require("express");
 const ejs = require("ejs");
 
-const sqlite3 = require("sqlite3");
-
 const colors = require("colors");
 
 const path = require("path");
 const fs = require("fs");
+
+let db = require("./db")
+db = new db(path.join(__dirname,"site.db"))
 
 // setup
 
