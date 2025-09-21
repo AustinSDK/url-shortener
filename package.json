@@ -21,6 +21,7 @@
     "@austinsdk/auth": "^1.1.1",
     "better-sqlite3": "^12.2.0",
     "cookie-parser": "^1.4.7",
+    "dotenv": "^17.2.2",
     "ejs": "^3.1.10",
     "express": "^5.1.0",
     "sqlite3": "^5.1.7"
