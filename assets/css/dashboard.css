@@ -1,0 +1,75 @@
+/* Dashboard Layout - Sidebar and main content */
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.dashboard-container {
+    display: flex;
+    flex: 1;
+    gap: 20px;
+    margin-top: 0;
+}
+
+#sidebar {
+    background-color: var(--background3);
+    border: 1px solid var(--background3-border);
+    border-radius: 5px;
+    padding: 20px;
+    width: 250px;
+    min-width: 250px;
+    height: fit-content;
+}
+
+#sidebar nav {
+    display: flex;
+    flex-direction: column;
+}
+
+#sidebar nav a {
+    color: var(--text2);
+    text-decoration: none;
+    padding: 12px 16px;
+    margin-bottom: 8px;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+}
+
+#sidebar nav a:hover {
+    background-color: var(--background2);
+    color: var(--text1);
+}
+
+#sidebar nav a.active {
+    background-color: var(--rust3);
+    color: var(--background1);
+    font-weight: 600;
+}
+
+/* Dashboard main content area */
+.dashboard-container #main {
+    flex: 1;
+}
+
+/* Responsive design for dashboard */
+@media (max-width: 1024px) {
+    .dashboard-container {
+        flex-direction: column;
+    }
+    
+    #sidebar {
+        width: 100%;
+        min-width: unset;
+    }
+    
+    #sidebar nav {
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+    
+    #sidebar nav a {
+        margin-bottom: 0;
+    }
+}

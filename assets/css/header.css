@@ -1,0 +1,32 @@
+/* Header Styling - Used on all pages */
+#header {
+    background-color: var(--background3);
+    border: 1px solid var(--background3-border);
+    border-radius: 5px;
+    padding: 15px 20px;
+    margin-bottom: 20px;
+}
+
+#header h1 {
+    margin: 0;
+    color: var(--text1);
+    font-weight: 600;
+}
+
+#header nav {
+    margin-top: 10px;
+}
+
+#header nav a {
+    color: var(--text2);
+    text-decoration: none;
+    margin-right: 20px;
+    padding: 8px 12px;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+}
+
+#header nav a:hover {
+    background-color: var(--background2);
+    color: var(--text1);
+}

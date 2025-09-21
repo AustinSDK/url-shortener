@@ -3,26 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <link rel="stylesheet" href="/css/main.css">
+    <title>Dashboard - Statistics</title>
     <link rel="stylesheet" href="/css/colors.css">
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/dashboard.css">
     <link rel="stylesheet" href="/css/stats.css">
 </head>
 <body>
     <%- include("../partials/header.ejs") %>
-    <%- include("partials/sidebar.ejs") %>
-    <div id="main">
-        <div id="stats">
-            <% Object.entries(stats).forEach(([key, value], idx) => { %>
-                <div id="stat-container-<%= idx + 1 %>" class="stat-container">
-                    <h3 class="stat-name">
-                        <%= key %>
-                    </h3>
-                    <p class="stat-info">
-                        <%= value %>
-                    </p>
-                </div>
-            <% }); %>
+    <div class="dashboard-container">
+        <%- include("partials/sidebar.ejs") %>
+        <div id="main">
+            <div id="stats">
+                <% Object.entries(stats).forEach(([key, value], idx) => { %>
+                    <div id="stat-container-<%= idx + 1 %>" class="stat-container">
+                        <h3 class="stat-name">
+                            <%= key %>
+                        </h3>
+                        <p class="stat-info">
+                            <%= value %>
+                        </p>
+                    </div>
+                <% }); %>
+            </div>
         </div>
     </div>
 </body>
