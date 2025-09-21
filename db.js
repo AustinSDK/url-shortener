@@ -11,12 +11,6 @@ module.exports = class{
                 warning BOOLEAN NOT NULL DEFAULT false,
                 username TEXT NOT NULL DEFAULT "no-name"
             );
-            CREATE TABLE IF NOT EXISTS cookies (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                cookie TEXT NOT NULL UNIQUE,
-                connection INTEGER NOT NULL,
-                FOREIGN KEY (connection) REFERENCES tokens (id)
-            );
             CREATE TABLE IF NOT EXISTS tokens (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 token TEXT NOT NULL UNIQUE
