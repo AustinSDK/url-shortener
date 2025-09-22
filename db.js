@@ -268,9 +268,6 @@ module.exports = class{
                 INSERT INTO clicks (short_url_id, hashed_ip, browser, referrer) 
                 VALUES (?, ?, ?, ?)
             `).run(shortId, hashedIp, browser, referrer);
-            
-            console.log(`✓ Click recorded for ${shortId.substring(0, 8)}... from ${browser} via ${referrer === 'Direct' ? 'Direct' : new URL(referrer).hostname}`);
-            
         } catch (error) {
             console.error('Error recording click:', error);
             // Don't throw - we don't want click tracking to break the redirect
