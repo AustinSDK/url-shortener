@@ -529,7 +529,7 @@ if (test){
     })
 }
 
-app.get(/.*/, (req, res) => {
+app.use( (req, res) => {
     res.status(404).render("404.ejs", { user: req.user, test: test });
 });
 
