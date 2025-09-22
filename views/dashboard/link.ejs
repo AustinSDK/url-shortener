@@ -10,6 +10,9 @@
     <link rel="stylesheet" href="/css/link.css">
     <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    
+    <!-- D3.js for charts -->
+    <script src="https://d3js.org/d3.v7.min.js"></script>
     <style>
         .link-detail-container {
             max-width: 1200px;
@@ -163,6 +166,106 @@
             color: var(--text2);
             font-style: italic;
             margin-top: 15px;
+        }
+
+        /* D3.js Chart Styles */
+        .d3-chart {
+            background: var(--background1);
+            border-radius: 8px;
+            margin-top: 15px;
+            overflow: hidden;
+        }
+
+        .d3-chart svg {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+
+        .line-chart-path {
+            fill: none;
+            stroke: var(--rust3);
+            stroke-width: 2px;
+            stroke-linejoin: round;
+            stroke-linecap: round;
+        }
+
+        .chart-dot {
+            fill: var(--rust3);
+            stroke: var(--background1);
+            stroke-width: 2px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .chart-dot:hover {
+            r: 6;
+            fill: var(--rust2);
+        }
+
+        .chart-axis {
+            color: var(--text2);
+            font-size: 12px;
+        }
+
+        .chart-axis line {
+            stroke: var(--background2-border);
+        }
+
+        .chart-axis path {
+            stroke: var(--background2-border);
+        }
+
+        .chart-axis text {
+            fill: var(--text2);
+            font-family: "Montserrat", sans-serif;
+        }
+
+        .chart-grid line {
+            stroke: var(--background2-border);
+            stroke-dasharray: 2,2;
+            opacity: 0.5;
+        }
+
+        .chart-tooltip {
+            position: absolute;
+            background: rgba(18, 9, 26, 0.95);
+            border: 1px solid var(--background2-border);
+            border-radius: 6px;
+            padding: 8px 12px;
+            color: var(--text1);
+            font-size: 13px;
+            pointer-events: none;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+
+        .pie-slice {
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .pie-slice:hover {
+            transform: scale(1.05);
+            filter: brightness(1.1);
+        }
+
+        .pie-label {
+            fill: var(--text1);
+            font-size: 12px;
+            font-family: "Montserrat", sans-serif;
+            text-anchor: middle;
+        }
+
+        .bar-rect {
+            fill: var(--rust3);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .bar-rect:hover {
+            fill: var(--rust2);
         }
 
         .action-buttons {
@@ -364,35 +467,19 @@
                             <span class="stat-label">This Week</span>
                             <span class="stat-value"><%= stats.thisWeekClicks %></span>
                         </div>
-                        <div class="chart-placeholder">
-                            📈 Click History Chart
+                        <div id="click-history-chart" class="d3-chart" style="height: 150px;">
                         </div>
                     </div>
 
                     <div class="stats-card">
                         <h3 class="stats-title">Top Referrers</h3>
-                        <div class="referrer-list">
-                            <% stats.topReferrers.forEach(referrer => { %>
-                                <div class="referrer-item">
-                                    <span><%= referrer.name %></span>
-                                    <span class="stat-value"><%= referrer.count %></span>
-                                </div>
-                            <% }) %>
+                        <div id="referrer-bar-chart" class="d3-chart" style="height: 180px;">
                         </div>
                     </div>
 
                     <div class="stats-card">
                         <h3 class="stats-title">Browsers</h3>
-                        <div class="browser-chart">
-                            <% stats.browsers.forEach(browser => { %>
-                                <div class="browser-item">
-                                    <span style="font-size: 0.9rem;"><%= browser.name %></span>
-                                    <div class="browser-bar">
-                                        <div class="browser-fill" style="width: <%= browser.percentage %>%"></div>
-                                    </div>
-                                    <span class="stat-value" style="font-size: 0.9rem;"><%= browser.percentage %>%</span>
-                                </div>
-                            <% }) %>
+                        <div id="browser-pie-chart" class="d3-chart" style="height: 200px;">
                         </div>
                     </div>
 
@@ -740,17 +827,356 @@
                 console.error('Toastify failed to load');
             }
             
-            const browserFills = document.querySelectorAll('.browser-fill');
-            setTimeout(() => {
-                browserFills.forEach(fill => {
-                    const width = fill.style.width;
-                    fill.style.width = '0%';
-                    setTimeout(() => {
-                        fill.style.width = width;
-                    }, 100);
-                });
-            }, 500);
+            // Initialize D3.js charts
+            initializeCharts();
         });
+
+        // Initialize all D3.js charts
+        function initializeCharts() {
+            // Check if D3 is loaded
+            if (typeof d3 === 'undefined') {
+                console.error('D3.js is not loaded');
+                return;
+            }
+
+            // Initialize click history chart
+            const clickData = <%- JSON.stringify(stats.clickHistory) %>;
+            createClickHistoryChart(clickData);
+
+            // Initialize browser pie chart
+            const browserData = <%- JSON.stringify(stats.browsers) %>;
+            createBrowserPieChart(browserData);
+
+            // Initialize referrer bar chart
+            const referrerData = <%- JSON.stringify(stats.topReferrers) %>;
+            createReferrerBarChart(referrerData);
+        }
+
+        // Create click history line chart
+        function createClickHistoryChart(data) {
+            const container = d3.select("#click-history-chart");
+            const containerNode = container.node();
+            if (!containerNode) return;
+
+            // Clear any existing content
+            container.selectAll("*").remove();
+
+            const margin = { top: 20, right: 20, bottom: 30, left: 40 };
+            const width = containerNode.offsetWidth - margin.left - margin.right;
+            const height = 150 - margin.top - margin.bottom;
+
+            const svg = container.append("svg")
+                .attr("width", width + margin.left + margin.right)
+                .attr("height", height + margin.top + margin.bottom);
+
+            const g = svg.append("g")
+                .attr("transform", `translate(${margin.left},${margin.top})`);
+
+            // Parse data and ensure we have valid dates
+            const parseDate = d3.timeParse("%m/%d/%Y");
+            const processedData = data.map(d => ({
+                date: parseDate(d.date) || new Date(d.date),
+                clicks: d.clicks || 0
+            })).filter(d => d.date);
+
+            if (processedData.length === 0) {
+                g.append("text")
+                    .attr("x", width / 2)
+                    .attr("y", height / 2)
+                    .attr("text-anchor", "middle")
+                    .style("fill", "var(--text2)")
+                    .text("No data available");
+                return;
+            }
+
+            // Scales
+            const xScale = d3.scaleTime()
+                .domain(d3.extent(processedData, d => d.date))
+                .range([0, width]);
+
+            const yScale = d3.scaleLinear()
+                .domain([0, d3.max(processedData, d => d.clicks) || 10])
+                .nice()
+                .range([height, 0]);
+
+            // Line generator
+            const line = d3.line()
+                .x(d => xScale(d.date))
+                .y(d => yScale(d.clicks))
+                .curve(d3.curveMonotoneX);
+
+            // Add grid lines
+            g.selectAll(".grid-line")
+                .data(yScale.ticks(4))
+                .enter().append("line")
+                .attr("class", "chart-grid")
+                .attr("x1", 0)
+                .attr("x2", width)
+                .attr("y1", d => yScale(d))
+                .attr("y2", d => yScale(d));
+
+            // Add axes
+            g.append("g")
+                .attr("class", "chart-axis")
+                .attr("transform", `translate(0,${height})`)
+                .call(d3.axisBottom(xScale)
+                    .tickFormat(d3.timeFormat("%m/%d"))
+                    .ticks(Math.min(processedData.length, 5)));
+
+            g.append("g")
+                .attr("class", "chart-axis")
+                .call(d3.axisLeft(yScale)
+                    .ticks(4)
+                    .tickFormat(d => d === 0 ? "0" : d));
+
+            // Add line path
+            g.append("path")
+                .datum(processedData)
+                .attr("class", "line-chart-path")
+                .attr("d", line);
+
+            // Add dots
+            const tooltip = d3.select("body").append("div")
+                .attr("class", "chart-tooltip");
+
+            g.selectAll(".chart-dot")
+                .data(processedData)
+                .enter().append("circle")
+                .attr("class", "chart-dot")
+                .attr("cx", d => xScale(d.date))
+                .attr("cy", d => yScale(d.clicks))
+                .attr("r", 4)
+                .on("mouseover", function(event, d) {
+                    tooltip.style("opacity", 1)
+                        .html(`<strong>${d3.timeFormat("%m/%d/%Y")(d.date)}</strong><br>${d.clicks} clicks`)
+                        .style("left", (event.pageX + 10) + "px")
+                        .style("top", (event.pageY - 10) + "px");
+                })
+                .on("mouseout", function() {
+                    tooltip.style("opacity", 0);
+                });
+        }
+
+        // Create browser pie chart
+        function createBrowserPieChart(data) {
+            const container = d3.select("#browser-pie-chart");
+            const containerNode = container.node();
+            if (!containerNode) return;
+
+            // Clear any existing content
+            container.selectAll("*").remove();
+
+            if (!data || data.length === 0) {
+                container.append("div")
+                    .style("display", "flex")
+                    .style("align-items", "center")
+                    .style("justify-content", "center")
+                    .style("height", "200px")
+                    .style("color", "var(--text2)")
+                    .text("No browser data available");
+                return;
+            }
+
+            const width = containerNode.offsetWidth;
+            const height = 200;
+            const radius = Math.min(width, height) / 2 - 20;
+
+            const svg = container.append("svg")
+                .attr("width", width)
+                .attr("height", height);
+
+            const g = svg.append("g")
+                .attr("transform", `translate(${width / 2},${height / 2})`);
+
+            // Color scale
+            const color = d3.scaleOrdinal()
+                .domain(data.map(d => d.name))
+                .range(['#d2691e', '#b7410e', '#8e7bbf', '#c7a6ff', '#ffd6e0']);
+
+            // Pie generator
+            const pie = d3.pie()
+                .value(d => d.percentage || d.count || 1)
+                .sort(null);
+
+            // Arc generator
+            const arc = d3.arc()
+                .innerRadius(radius * 0.4)  // Donut chart
+                .outerRadius(radius);
+
+            const labelArc = d3.arc()
+                .innerRadius(radius * 0.7)
+                .outerRadius(radius * 0.7);
+
+            // Create tooltip
+            const tooltip = d3.select("body").append("div")
+                .attr("class", "chart-tooltip");
+
+            // Draw pie slices
+            const slices = g.selectAll(".pie-slice")
+                .data(pie(data))
+                .enter().append("g")
+                .attr("class", "pie-slice");
+
+            slices.append("path")
+                .attr("d", arc)
+                .attr("fill", d => color(d.data.name))
+                .on("mouseover", function(event, d) {
+                    d3.select(this).style("filter", "brightness(1.1)");
+                    tooltip.style("opacity", 1)
+                        .html(`<strong>${d.data.name}</strong><br>${d.data.percentage || d.data.count}${d.data.percentage ? '%' : ' clicks'}`)
+                        .style("left", (event.pageX + 10) + "px")
+                        .style("top", (event.pageY - 10) + "px");
+                })
+                .on("mouseout", function() {
+                    d3.select(this).style("filter", null);
+                    tooltip.style("opacity", 0);
+                });
+
+            // Add labels
+            slices.append("text")
+                .attr("class", "pie-label")
+                .attr("transform", d => `translate(${labelArc.centroid(d)})`)
+                .attr("dy", "0.35em")
+                .style("font-size", "11px")
+                .text(d => {
+                    const percentage = d.data.percentage || Math.round((d.data.count / d3.sum(data, d => d.count)) * 100);
+                    return percentage > 5 ? `${percentage}%` : '';
+                });
+
+            // Add center text
+            g.append("text")
+                .attr("text-anchor", "middle")
+                .attr("dy", "-0.1em")
+                .style("font-size", "14px")
+                .style("font-weight", "bold")
+                .style("fill", "var(--text1)")
+                .text("Browsers");
+
+            g.append("text")
+                .attr("text-anchor", "middle")
+                .attr("dy", "1.2em")
+                .style("font-size", "12px")
+                .style("fill", "var(--text2)")
+                .text(`${data.length} types`);
+        }
+
+        // Create referrer horizontal bar chart
+        function createReferrerBarChart(data) {
+            const container = d3.select("#referrer-bar-chart");
+            const containerNode = container.node();
+            if (!containerNode) return;
+
+            // Clear any existing content
+            container.selectAll("*").remove();
+
+            if (!data || data.length === 0) {
+                container.append("div")
+                    .style("display", "flex")
+                    .style("align-items", "center")
+                    .style("justify-content", "center")
+                    .style("height", "180px")
+                    .style("color", "var(--text2)")
+                    .text("No referrer data available");
+                return;
+            }
+
+            const margin = { top: 20, right: 40, bottom: 30, left: 80 };
+            const width = containerNode.offsetWidth - margin.left - margin.right;
+            const height = 180 - margin.top - margin.bottom;
+
+            const svg = container.append("svg")
+                .attr("width", width + margin.left + margin.right)
+                .attr("height", height + margin.top + margin.bottom);
+
+            const g = svg.append("g")
+                .attr("transform", `translate(${margin.left},${margin.top})`);
+
+            // Process data - limit to top 5 referrers
+            const processedData = data.slice(0, 5);
+
+            // Scales
+            const xScale = d3.scaleLinear()
+                .domain([0, d3.max(processedData, d => d.count) || 10])
+                .range([0, width]);
+
+            const yScale = d3.scaleBand()
+                .domain(processedData.map(d => d.name))
+                .range([0, height])
+                .padding(0.2);
+
+            // Color scale
+            const colorScale = d3.scaleOrdinal()
+                .domain(processedData.map(d => d.name))
+                .range(['#d2691e', '#b7410e', '#8e7bbf', '#c7a6ff', '#ffd6e0']);
+
+            // Create tooltip
+            const tooltip = d3.select("body").append("div")
+                .attr("class", "chart-tooltip");
+
+            // Add bars
+            g.selectAll(".bar-rect")
+                .data(processedData)
+                .enter().append("rect")
+                .attr("class", "bar-rect")
+                .attr("y", d => yScale(d.name))
+                .attr("height", yScale.bandwidth())
+                .attr("x", 0)
+                .attr("width", 0)
+                .attr("fill", d => colorScale(d.name))
+                .on("mouseover", function(event, d) {
+                    d3.select(this).style("filter", "brightness(1.1)");
+                    tooltip.style("opacity", 1)
+                        .html(`<strong>${d.name}</strong><br>${d.count} visits`)
+                        .style("left", (event.pageX + 10) + "px")
+                        .style("top", (event.pageY - 10) + "px");
+                })
+                .on("mouseout", function() {
+                    d3.select(this).style("filter", null);
+                    tooltip.style("opacity", 0);
+                })
+                .transition()
+                .duration(800)
+                .delay((d, i) => i * 100)
+                .attr("width", d => xScale(d.count));
+
+            // Add value labels on bars
+            g.selectAll(".bar-label")
+                .data(processedData)
+                .enter().append("text")
+                .attr("class", "bar-label")
+                .attr("x", d => xScale(d.count) + 5)
+                .attr("y", d => yScale(d.name) + yScale.bandwidth() / 2)
+                .attr("dy", "0.35em")
+                .style("fill", "var(--text2)")
+                .style("font-size", "12px")
+                .style("opacity", 0)
+                .text(d => d.count)
+                .transition()
+                .duration(800)
+                .delay((d, i) => i * 100 + 400)
+                .style("opacity", 1);
+
+            // Add y-axis (referrer names)
+            g.append("g")
+                .attr("class", "chart-axis")
+                .call(d3.axisLeft(yScale)
+                    .tickSize(0))
+                .selectAll("text")
+                .style("font-size", "11px")
+                .each(function(d) {
+                    // Truncate long referrer names
+                    const text = d3.select(this);
+                    const originalText = text.text();
+                    if (originalText.length > 12) {
+                        text.text(originalText.substring(0, 12) + "...");
+                    }
+                });
+
+            // Remove y-axis line
+            g.select(".domain").remove();
+        }
+    </script>
+        }
     </script>
 </body>
 </html>

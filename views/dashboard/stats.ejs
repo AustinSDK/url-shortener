@@ -32,7 +32,7 @@
                     <% }); %>
                 </div>
             </section>
-
+            <% /*  %>
             <!-- Click Trends -->
             <% if (dashboardData.clickTrends && dashboardData.clickTrends.length > 0) { %>
             <section class="stats-section">
@@ -55,6 +55,7 @@
                 </div>
             </section>
             <% } %>
+            <% */ %>
 
             <!-- Two-column layout for detailed stats -->
             <div class="stats-grid">
@@ -107,9 +108,6 @@
                             <div class="recent-link-item">
                                 <div class="recent-link-header">
                                     <strong>/u/<%= link.short %></strong>
-                                    <% if (link.warning) { %>
-                                        <span class="warning-badge">⚠️</span>
-                                    <% } %>
                                 </div>
                                 <div class="recent-link-url"><%= link.url.length > 50 ? link.url.substring(0, 50) + '...' : link.url %></div>
                                 <div class="recent-link-meta">
@@ -142,17 +140,6 @@
                 </section>
                 <% } %>
             </div>
-
-            <!-- Most Popular Link Highlight -->
-            <% if (dashboardData.mostPopular) { %>
-            <section class="stats-section highlight">
-                <h2>🏆 Most Popular Link</h2>
-                <div class="popular-link">
-                    <strong>/u/<%= dashboardData.mostPopular %></strong>
-                    <p>This link is leading the pack with the most clicks!</p>
-                </div>
-            </section>
-            <% } %>
         </div>
     </div>
     
