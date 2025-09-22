@@ -95,3 +95,7 @@ button:hover {
 .btn-secondary:hover {
     background: var(--background1);
 }
+
+h1{
+    text-transform: uppercase;
+}

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create link</title>
+    <link rel="stylesheet" href="/css/colors.css">
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/dashboard.css">
+    <link rel="stylesheet" href="/css/link.css">
+    <link rel="stylesheet" href="/css/forms.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+</head>
+<body>
+    <%- include("../partials/header.ejs", {user: user, test: test}) %>
+    
+    <div class="dashboard-container">
+        <%- include("partials/sidebar.ejs") %>
+        <div id="main">
+            <h1>Create url</h1>
+            <form action="" method="post">
+                <label for="slug">Slug</label>
+                <input type="text" name="slug" placeholder="slug">
+                <label for="slug">url</label>
+                <input type="text" name="url" placeholder="https://hackclub.com">
+                <% if (isAdmin) { %>
+                <label class="custom-checkbox">
+                    <input type="checkbox" name="warning" value="true">
+                    <span class="checkmark"></span>
+                    Warning page enabled
+                </label>
+                <% } %>
+                <br>
+                <input type="submit" value="Create Page">
+            </form>
+        </div>
+    </div>
+</body>
+</html>

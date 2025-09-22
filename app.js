@@ -225,6 +225,12 @@ app.get("/dashboard/:db",(req,res,next)=>{
     }
     return next();
 })
+app.post("/dashboard/:db",(req,res,next)=>{
+    if (!req.user){
+        return res.redirect("/login");
+    }
+    return next();
+})
 app.get("/dashboard/stats", (req, res, next) => {
     try {
         // Get user-specific statistics (only their links)
@@ -328,6 +334,57 @@ app.get("/dashboard/stats", (req, res, next) => {
 app.get("/dashboard/links", (req, res, next) => {
     const links = db.getShortsByUsername(req.user.username)
     res.render("dashboard/links.ejs", { links:links,user:req.user, test:test });
+});
+app.get("/dashboard/create", (req, res, next) => {
+    return res.render("dashboard/create.ejs",{
+        user:req.user,
+        test:test, 
+        isAdmin: req.user.permissions.includes("admin") || req.user.permissions.includes("url-admin")
+    })
+});
+app.post("/dashboard/create", (req, res, next) => {
+    let log = console.log
+    if (!test){
+        log = ()=>{} // dont flood console ig
+    }
+    let _warning = false;
+    if (!req.body || !req.body.slug || !req.body.url){
+        log("Redirecting: Missing slug or url in request body");
+        return res.redirect("");
+    }
+    const slugPattern = /^[A-Za-z0-9_-]+$/;
+    if (!slugPattern.test(req.body.slug)) {
+        log("Redirecting: Invalid slug format");
+        return res.redirect(""); // Invalid slug
+    }
+
+    // Validate URL: must be http or https, not javascript: or other protocols
+    let urlValid = false;
+    try {
+        const parsedUrl = new URL(req.body.url);
+        if (parsedUrl.protocol === "http:" || parsedUrl.protocol === "https:") {
+            urlValid = true;
+        }
+    } catch (e) {
+        urlValid = false;
+    }
+    if (!urlValid) {
+        log("Redirecting: Invalid URL format");
+        return res.redirect(""); // Invalid URL
+    }
+    if (req.body.warning == "true"){
+        _warning = true
+    }
+    if (!req.user.permissions.includes("admin") && !req.user.permissions.includes("url-admin")){
+        _warning = false
+    }
+    let _short = db.getShort(req.body.slug);
+    if (_short){
+        log("Pre existing url :(")
+        return res.redirect("")
+    }
+    db.addShort(req.body.slug,req.body.url,req.user.username,_warning)
+    return res.redirect("/dashboard/link/"+req.body.slug)
 });
 app.get("/dashboard/link/:short", (req, res, next) => {
     const link = db.getShort(req.params.short);

@@ -1,0 +1,514 @@
+/* Forms CSS - Styling for form elements */
+
+form {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+    background: var(--background2);
+    border: 1px solid var(--background2-border);
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: var(--text1);
+    font-size: 14px;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="url"],
+input[type="search"],
+input[type="tel"],
+input[type="number"],
+input[type="date"],
+input[type="datetime-local"],
+input[type="month"],
+input[type="week"],
+input[type="time"],
+input[type="color"],
+textarea,
+select {
+    width: 100%;
+    padding: 12px 16px;
+    margin-bottom: 20px;
+    border: 2px solid var(--background3-border);
+    border-radius: 6px;
+    font-size: 16px;
+    font-family: inherit;
+    background-color: var(--background3);
+    color: var(--text2);
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    box-sizing: border-box;
+}
+
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus,
+input[type="url"]:focus,
+input[type="search"]:focus,
+input[type="tel"]:focus,
+input[type="number"]:focus,
+input[type="date"]:focus,
+input[type="datetime-local"]:focus,
+input[type="month"]:focus,
+input[type="week"]:focus,
+input[type="time"]:focus,
+input[type="color"]:focus,
+textarea:focus,
+select:focus {
+    outline: none;
+    border-color: var(--rust1);
+    box-shadow: 0 0 0 3px rgba(183, 65, 14, 0.2);
+}
+
+input[type="text"]:hover,
+input[type="email"]:hover,
+input[type="password"]:hover,
+input[type="url"]:hover,
+input[type="search"]:hover,
+input[type="tel"]:hover,
+input[type="number"]:hover,
+input[type="date"]:hover,
+input[type="datetime-local"]:hover,
+input[type="month"]:hover,
+input[type="week"]:hover,
+input[type="time"]:hover,
+input[type="color"]:hover,
+textarea:hover,
+select:hover {
+    border-color: var(--text1-muted);
+}
+
+input[type="text"]::placeholder,
+input[type="email"]::placeholder,
+input[type="password"]::placeholder,
+input[type="url"]::placeholder,
+input[type="search"]::placeholder,
+input[type="tel"]::placeholder,
+input[type="number"]::placeholder,
+textarea::placeholder {
+    color: var(--text2-muted);
+    opacity: 1;
+}
+
+textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+/* File Input Styles */
+input[type="file"] {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 20px;
+    border: 2px dashed var(--background3-border);
+    border-radius: 6px;
+    background-color: var(--background3);
+    color: var(--text2);
+    font-family: inherit;
+    font-size: 14px;
+    cursor: pointer;
+    transition: border-color 0.3s ease;
+    box-sizing: border-box;
+}
+
+input[type="file"]:hover {
+    border-color: var(--text1-muted);
+}
+
+input[type="file"]:focus {
+    outline: none;
+    border-color: var(--rust1);
+    border-style: solid;
+}
+
+/* File input wrapper for custom styling */
+.file-input-wrapper {
+    position: relative;
+    display: inline-block;
+    width: 100%;
+    margin-bottom: 20px;
+}
+
+.file-input-wrapper input[type="file"] {
+    position: absolute;
+    left: -9999px;
+    margin: 0;
+}
+
+.file-input-label {
+    display: block;
+    padding: 12px 16px;
+    background-color: var(--background3);
+    border: 2px solid var(--background3-border);
+    border-radius: 6px;
+    color: var(--text2);
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.file-input-label:hover {
+    border-color: var(--text1-muted);
+    background-color: var(--background2);
+}
+
+.file-input-wrapper input[type="file"]:focus + .file-input-label {
+    border-color: var(--rust1);
+    box-shadow: 0 0 0 3px rgba(183, 65, 14, 0.2);
+}
+
+/* Range Input Styles */
+input[type="range"] {
+    width: 100%;
+    margin-bottom: 20px;
+    appearance: none;
+    height: 6px;
+    border-radius: 3px;
+    background: var(--background3);
+    outline: none;
+    transition: background 0.3s ease;
+}
+
+input[type="range"]:hover {
+    background: var(--background3-border);
+}
+
+input[type="range"]::-webkit-slider-thumb {
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: var(--rust1);
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+input[type="range"]::-webkit-slider-thumb:hover {
+    background: var(--rust2);
+}
+
+input[type="range"]::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: var(--rust1);
+    cursor: pointer;
+    border: none;
+    transition: background 0.3s ease;
+}
+
+input[type="range"]::-moz-range-thumb:hover {
+    background: var(--rust2);
+}
+
+/* Button Styles */
+button,
+input[type="submit"],
+input[type="button"] {
+    background-color: var(--rust1);
+    color: var(--text2);
+    padding: 12px 24px;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.1s ease;
+    display: inline-block;
+    text-decoration: none;
+    text-align: center;
+    min-width: 120px;
+}
+
+button:hover,
+input[type="submit"]:hover,
+input[type="button"]:hover {
+    background-color: var(--rust2);
+    transform: translateY(-1px);
+}
+
+button:active,
+input[type="submit"]:active,
+input[type="button"]:active {
+    transform: translateY(0);
+}
+
+button:disabled,
+input[type="submit"]:disabled,
+input[type="button"]:disabled {
+    background-color: var(--text2-muted);
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Secondary Button */
+button.secondary,
+input[type="button"].secondary {
+    background-color: var(--background3);
+    border: 2px solid var(--background3-border);
+}
+
+button.secondary:hover,
+input[type="button"].secondary:hover {
+    background-color: var(--background2);
+    border-color: var(--text1-muted);
+}
+
+/* Danger Button */
+button.danger,
+input[type="button"].danger {
+    background-color: var(--rust3);
+}
+
+button.danger:hover,
+input[type="button"].danger:hover {
+    background-color: var(--rust1);
+}
+
+/* Form Groups */
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    margin-bottom: 8px;
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+    margin-bottom: 0;
+}
+
+/* Form Row (for side-by-side fields) */
+.form-row {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+.form-row .form-group {
+    flex: 1;
+    margin-bottom: 0;
+}
+
+/* Checkbox and Radio Styles */
+input[type="checkbox"],
+input[type="radio"] {
+    width: 18px;
+    height: 18px;
+    margin-right: 8px;
+    margin-bottom: 0;
+    accent-color: var(--rust1);
+    cursor: pointer;
+}
+
+/* Custom Checkbox Styles */
+.custom-checkbox,
+.custom-radio {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    margin-bottom: 16px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.custom-checkbox input[type="checkbox"],
+.custom-radio input[type="radio"] {
+    position: absolute;
+    left: -9999px;
+}
+
+.custom-checkbox .checkmark,
+.custom-radio .checkmark {
+    position: relative;
+    width: 18px;
+    height: 18px;
+    background-color: var(--background3);
+    border: 2px solid var(--background3-border);
+    border-radius: 3px;
+    margin-right: 10px;
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+}
+
+.custom-radio .checkmark {
+    border-radius: 50%;
+}
+
+.custom-checkbox:hover .checkmark,
+.custom-radio:hover .checkmark {
+    border-color: var(--text1-muted);
+}
+
+.custom-checkbox input[type="checkbox"]:checked + .checkmark,
+.custom-radio input[type="radio"]:checked + .checkmark {
+    background-color: var(--rust1);
+    border-color: var(--rust1);
+}
+
+.custom-checkbox input[type="checkbox"]:focus + .checkmark,
+.custom-radio input[type="radio"]:focus + .checkmark {
+    box-shadow: 0 0 0 3px rgba(183, 65, 14, 0.2);
+}
+
+/* Checkmark symbol */
+.custom-checkbox .checkmark::after {
+    content: "";
+    position: absolute;
+    display: none;
+    left: 5px;
+    top: 2px;
+    width: 4px;
+    height: 8px;
+    border: solid var(--text2);
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
+
+.custom-checkbox input[type="checkbox"]:checked + .checkmark::after {
+    display: block;
+}
+
+/* Radio button dot */
+.custom-radio .checkmark::after {
+    content: "";
+    position: absolute;
+    display: none;
+    top: 50%;
+    left: 50%;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--text2);
+    transform: translate(-50%, -50%);
+}
+
+.custom-radio input[type="radio"]:checked + .checkmark::after {
+    display: block;
+}
+
+.checkbox-group,
+.radio-group {
+    display: flex;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.checkbox-group label,
+.radio-group label {
+    margin-bottom: 0;
+    font-weight: normal;
+    cursor: pointer;
+    color: var(--text2);
+}
+
+/* Error States */
+.form-error input[type="text"],
+.form-error input[type="email"],
+.form-error input[type="password"],
+.form-error input[type="url"],
+.form-error input[type="search"],
+.form-error input[type="tel"],
+.form-error input[type="number"],
+.form-error input[type="date"],
+.form-error input[type="datetime-local"],
+.form-error input[type="month"],
+.form-error input[type="week"],
+.form-error input[type="time"],
+.form-error input[type="color"],
+.form-error input[type="file"],
+.form-error textarea,
+.form-error select {
+    border-color: var(--rust3);
+}
+
+.error-message {
+    color: var(--rust3);
+    font-size: 14px;
+    margin-top: -16px;
+    margin-bottom: 16px;
+    display: block;
+}
+
+/* Success States */
+.form-success input[type="text"],
+.form-success input[type="email"],
+.form-success input[type="password"],
+.form-success input[type="url"],
+.form-success input[type="search"],
+.form-success input[type="tel"],
+.form-success input[type="number"],
+.form-success input[type="date"],
+.form-success input[type="datetime-local"],
+.form-success input[type="month"],
+.form-success input[type="week"],
+.form-success input[type="time"],
+.form-success input[type="color"],
+.form-success input[type="file"],
+.form-success textarea,
+.form-success select {
+    border-color: var(--text1);
+}
+
+.success-message {
+    color: var(--text1);
+    font-size: 14px;
+    margin-top: -16px;
+    margin-bottom: 16px;
+    display: block;
+}
+
+/* Help Text */
+.help-text {
+    font-size: 14px;
+    color: var(--text2-muted);
+    margin-top: -16px;
+    margin-bottom: 16px;
+}
+
+/* Required Field Indicator */
+.required::after {
+    content: " *";
+    color: var(--rust1);
+}
+
+/* Form Actions */
+.form-actions {
+    margin-top: 32px;
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+}
+
+.form-actions button {
+    margin: 0;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    form {
+        margin: 0 16px;
+        padding: 16px;
+    }
+    
+    .form-row {
+        flex-direction: column;
+        gap: 0;
+    }
+    
+    .form-actions {
+        flex-direction: column;
+    }
+    
+    .form-actions button {
+        width: 100%;
+    }
+}
