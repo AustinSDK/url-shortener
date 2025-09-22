@@ -179,7 +179,7 @@ app.get("/callback/auth",async (req,res,next)=>{
         tokenResponse = await auth.codeForToken(_code);
         if (!tokenResponse.access_token) throw error("invalid auth?")
         res.cookie("token",tokenResponse.access_token);
-        res.send("check cookies?")
+        res.redirect("/")
     } catch (error) {
         console.log('Oops, something went wrong:', error);
         res.send(error,":(")
