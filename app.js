@@ -161,6 +161,18 @@ app.get("/u/:short",(req,res,next)=>{
     if (!_short){
         return res.send("invalid url")
     }
+    
+    // Record click statistics
+    const hashedIp = require('crypto').createHash('sha256').update(req.ip || 'unknown').digest('hex');
+    const browser = req.get('User-Agent') ? req.get('User-Agent').split(' ')[0] : 'unknown';
+    const referrer = req.get('Referer') || 'Direct';
+    
+    try {
+        db.recordClick(_short.id, hashedIp, browser, referrer);
+    } catch (error) {
+        console.error('Failed to record click:', error);
+    }
+    
     if (_short.warning === 1){
         res.cookie("_redirect",_short.url)
         return res.redirect("/approve")
@@ -214,15 +226,104 @@ app.get("/dashboard/:db",(req,res,next)=>{
     return next();
 })
 app.get("/dashboard/stats", (req, res, next) => {
-    const stats = {
-        "Total Shortened URLs": 1234,
-        "Total Redirects": 5678,
-        "Active Users": 42,
-        "Unique Visitors": 314,
-        "Most Popular URL": "abc123",
-        "URLs Created Today": 12
-    };
-    res.render("dashboard/stats.ejs", { stats,user:req.user, test:test });
+    try {
+        // Get user-specific statistics (only their links)
+        const userLinks = db.getShortsByUsername(req.user.username);
+        const userLinkIds = userLinks.map(link => link.id);
+        
+        // If user has no links, show empty dashboard
+        if (userLinkIds.length === 0) {
+            const dashboardData = {
+                basicStats: {
+                    "Total Shortened URLs": 0,
+                    "Total Redirects": 0,
+                    "URLs Created Today": 0,
+                    "Average Clicks per URL": 0
+                },
+                mostPopular: null,
+                recentLinks: [],
+                topLinks: [],
+                browserStats: [],
+                referrerStats: [],
+                clickTrends: []
+            };
+            return res.render("dashboard/stats.ejs", { 
+                dashboardData, 
+                user: req.user, 
+                test: test 
+            });
+        }
+        
+        // Get comprehensive user-specific statistics
+        const totalLinks = userLinks.length;
+        const totalClicks = db.getUserTotalClicks(req.user.username);
+        const linksToday = db.getUserLinksCreatedToday(req.user.username);
+        const mostPopular = db.getUserMostPopularLink(req.user.username);
+        
+        // Get recent links (user's last 10)
+        const recentLinks = db.getUserRecentLinks(req.user.username, 10);
+        
+        // Get user's top performing links with click counts
+        const topLinks = db.getUserTopLinks(req.user.username, 5);
+        
+        // Get browser statistics across user's links
+        const browserStats = db.getUserBrowserStats(req.user.username);
+        
+        // Get referrer statistics across user's links
+        const referrerStats = db.getUserReferrerStats(req.user.username, 10);
+        
+        // Get temporal data - clicks over the last 7 days for user's links
+        const clickTrends = db.getUserClickTrends(req.user.username, 7);
+        
+        // Format data for dashboard
+        const dashboardData = {
+            // Basic metrics
+            basicStats: {
+                "Total Shortened URLs": totalLinks,
+                "Total Redirects": totalClicks,
+                "URLs Created Today": linksToday,
+                "Average Clicks per URL": totalLinks > 0 ? Math.round(totalClicks / totalLinks) : 0
+            },
+            
+            // Most popular link info
+            mostPopular: mostPopular || null,
+            
+            // Recent activity
+            recentLinks: recentLinks || [],
+            
+            // Top performing links
+            topLinks: topLinks || [],
+            
+            // Browser distribution
+            browserStats: browserStats || [],
+            
+            // Traffic sources
+            referrerStats: referrerStats || [],
+            
+            // Temporal trends
+            clickTrends: clickTrends || []
+        };
+        
+        res.render("dashboard/stats.ejs", { 
+            dashboardData, 
+            user: req.user, 
+            test: test 
+        });
+    } catch (error) {
+        console.error('Error loading dashboard stats:', error);
+        // Fallback to basic stats on error
+        const stats = {
+            "Total Shortened URLs": 0,
+            "Total Redirects": 0,
+            "URLs Created Today": 0,
+            "Most Popular URL": "No data yet"
+        };
+        res.render("dashboard/stats.ejs", { 
+            dashboardData: { basicStats: stats, mostPopular: null, recentLinks: [], topLinks: [], browserStats: [], referrerStats: [], clickTrends: [] },
+            user: req.user, 
+            test: test 
+        });
+    }
 });
 app.get("/dashboard/links", (req, res, next) => {
     const links = db.getShortsByUsername(req.user.username)
@@ -243,34 +344,54 @@ app.get("/dashboard/link/:short", (req, res, next) => {
         return res.status(403).render("403.ejs", { user: req.user, test: test });
     }
     
-    // Mock stats data for easy backend editing
-    const mockStats = {
-        totalClicks: Math.floor(Math.random() * 1000) + 50,
-        todayClicks: Math.floor(Math.random() * 50) + 5,
-        thisWeekClicks: Math.floor(Math.random() * 200) + 20,
-        topReferrers: [
-            { name: "Direct", count: Math.floor(Math.random() * 100) + 10 },
-            { name: "Google", count: Math.floor(Math.random() * 80) + 5 },
-            { name: "Twitter", count: Math.floor(Math.random() * 60) + 3 },
-            { name: "Facebook", count: Math.floor(Math.random() * 40) + 2 }
-        ],
-        clickHistory: Array.from({length: 7}, (_, i) => ({
-            date: new Date(Date.now() - (6-i) * 24 * 60 * 60 * 1000).toLocaleDateString(),
-            clicks: Math.floor(Math.random() * 30) + 5
-        })),
-        browsers: [
-            { name: "Chrome", percentage: 65 },
-            { name: "Firefox", percentage: 18 },
-            { name: "Safari", percentage: 12 },
-            { name: "Edge", percentage: 5 }
-        ]
+    // Get real statistics data
+    const totalClicks = db.getTotalClicksForShort(link.id);
+    const todayClicks = db.getClicksForShortToday(link.id);
+    const thisWeekClicks = db.getClicksForShortByDateRange(link.id, 7);
+    const topReferrers = db.getTopReferrersForShort(link.id, 4);
+    const clickHistory = db.getClickHistoryForShort(link.id, 7);
+    const browsers = db.getBrowserStatsForShort(link.id);
+    
+    // Format referrers data
+    const formattedReferrers = topReferrers.length > 0 ? topReferrers.map(ref => ({
+        name: ref.refer_link === 'unknown' ? 'Direct' : ref.refer_link,
+        count: ref.count
+    })) : [
+        { name: "Direct", count: 0 },
+        { name: "No data yet", count: 0 }
+    ];
+    
+    // Format click history with proper dates
+    const formattedClickHistory = Array.from({length: 7}, (_, i) => {
+        const date = new Date();
+        date.setDate(date.getDate() - (6 - i));
+        const dateStr = date.toISOString().split('T')[0];
+        const found = clickHistory.find(ch => ch.day === dateStr);
+        return {
+            date: date.toLocaleDateString(),
+            clicks: found ? found.clicks : 0
+        };
+    });
+    
+    // Format browser data or use defaults if no data
+    const formattedBrowsers = browsers.length > 0 ? browsers : [
+        { name: "No data yet", percentage: 100 }
+    ];
+    
+    const realStats = {
+        totalClicks: totalClicks,
+        todayClicks: todayClicks,
+        thisWeekClicks: thisWeekClicks,
+        topReferrers: formattedReferrers,
+        clickHistory: formattedClickHistory,
+        browsers: formattedBrowsers
     };
     
     res.render("dashboard/link.ejs", { 
         link: link, 
         user: req.user, 
         test: test, 
-        stats: mockStats,
+        stats: realStats,
         isOwner: link.username === req.user.username,
         isAdmin: req.user.permissions.includes("admin") || req.user.permissions.includes("url-admin"),
         req: req
@@ -300,8 +421,19 @@ app.post("/api/link/:short/edit", (req, res, next) => {
         return res.status(400).json({ success: false, message: "Valid URL is required" });
     }
     
+    // Check if user is trying to change warning setting
+    const isChangingWarning = warning !== undefined && (warning ? 1 : 0) !== link.warning;
+    const isAdmin = req.user.permissions.includes("admin") || req.user.permissions.includes("url-admin");
+    
+    if (isChangingWarning && !isAdmin) {
+        return res.status(403).json({ success: false, message: "Only admins can modify warning settings" });
+    }
+    
+    // Use existing warning value if not admin or not provided
+    const finalWarning = isAdmin && warning !== undefined ? (warning ? 1 : 0) : link.warning;
+    
     try {
-        db.modifyShort(link.id, req.params.short, url, link.username, warning ? 1 : 0);
+        db.modifyShort(link.id, req.params.short, url, link.username, finalWarning);
         res.json({ success: true, message: "Link updated successfully" });
     } catch (error) {
         console.error("Error updating link:", error);

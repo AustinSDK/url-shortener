@@ -501,12 +501,14 @@
                             box-sizing: border-box;
                         ">
                     </div>
+                    <% if (isAdmin) { %>
                     <div style="margin-bottom: 25px;">
                         <label style="display: flex; align-items: center; gap: 8px; color: var(--text1); cursor: pointer;">
                             <input type="checkbox" id="editWarning" <%= link.warning ? 'checked' : '' %> style="margin: 0;">
                             Enable warning page
                         </label>
                     </div>
+                    <% } %>
                     <div style="display: flex; gap: 15px; justify-content: flex-end;">
                         <button type="button" onclick="closeEditModal()" style="
                             padding: 12px 24px;
@@ -540,7 +542,13 @@
             document.getElementById('editForm').addEventListener('submit', async (e) => {
                 e.preventDefault();
                 const url = document.getElementById('editUrl').value;
-                const warning = document.getElementById('editWarning').checked;
+                
+                // Only get warning value if user is admin, otherwise keep current value
+                let warning = <%= link.warning ? 1 : 0 %>;
+                const warningElement = document.getElementById('editWarning');
+                if (warningElement) {
+                    warning = warningElement.checked ? 1 : 0;
+                }
                 
                 try {
                     const response = await fetch('/api/link/<%= link.short %>/edit', {

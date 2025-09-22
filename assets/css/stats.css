@@ -1,11 +1,32 @@
 /* Stats Dashboard Styling */
-#stats {
+#basic-stats {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
     gap: 20px;
     padding: 20px;
     max-width: 1200px;
     margin: 0 auto;
+}
+
+.stats-section {
+    margin-bottom: 40px;
+    background-color: var(--background1);
+    border-radius: 12px;
+    padding: 25px;
+    border: 1px solid var(--background1-border);
+}
+
+.stats-section h2 {
+    margin: 0 0 20px 0;
+    color: var(--text1);
+    font-size: 1.4rem;
+    font-weight: 600;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
 }
 
 .stat-container {
@@ -26,6 +47,7 @@
     font-size: 1.1rem;
     font-weight: 600;
     color: var(--text1);
+    text-transform: uppercase;
 }
 
 .stat-container p {
@@ -34,6 +56,8 @@
     line-height: 1.6;
     width: 100%;
     height: 100%;
+    font-size: 1.5rem;
+    font-weight: bold;
 }
 
 .stat-container b {
@@ -41,9 +65,232 @@
     font-weight: 700;
 }
 
+/* Click Trends Chart */
+.chart-container {
+    padding: 20px;
+    background-color: var(--background2);
+    border-radius: 8px;
+    border: 1px solid var(--background2-border);
+}
+
+.trend-chart {
+    display: flex;
+    justify-content: space-around;
+    align-items: flex-end;
+    height: 200px;
+    gap: 10px;
+}
+
+.trend-bar {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1;
+}
+
+.bar {
+    background: linear-gradient(to top, var(--rust3), var(--rust2));
+    min-height: 20px;
+    width: 100%;
+    border-radius: 4px 4px 0 0;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 5px 0;
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.bar:hover {
+    filter: brightness(1.2);
+}
+
+.bar-value {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: white;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+}
+
+.bar-label {
+    margin-top: 8px;
+    font-size: 0.9rem;
+    color: var(--text2);
+}
+
+/* Top Links */
+.link-item {
+    display: flex;
+    align-items: center;
+    padding: 15px;
+    background-color: var(--background2);
+    border-radius: 8px;
+    border: 1px solid var(--background2-border);
+    margin-bottom: 12px;
+}
+
+.rank {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: var(--rust3);
+    margin-right: 15px;
+    min-width: 30px;
+}
+
+.link-details {
+    flex: 1;
+    margin-right: 15px;
+}
+
+.link-details strong {
+    color: var(--text1);
+    font-size: 1.1rem;
+}
+
+.link-url {
+    color: var(--text2);
+    font-size: 0.9rem;
+    margin-top: 4px;
+}
+
+.click-count {
+    color: var(--rust3);
+    font-weight: 600;
+}
+
+/* Browser Statistics */
+.browser-item {
+    margin-bottom: 15px;
+}
+
+.browser-info {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 5px;
+}
+
+.browser-name {
+    color: var(--text1);
+    font-weight: 500;
+}
+
+.browser-percentage {
+    color: var(--rust3);
+    font-weight: 600;
+}
+
+.browser-bar {
+    width: 100%;
+    height: 8px;
+    background-color: var(--background3);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 5px;
+}
+
+.browser-fill {
+    height: 100%;
+    background: linear-gradient(to right, var(--rust3), var(--rust2));
+    border-radius: 4px;
+    transition: width 0.5s ease;
+}
+
+.browser-count {
+    color: var(--text2);
+    font-size: 0.9rem;
+}
+
+/* Recent Links */
+.recent-link-item {
+    padding: 15px;
+    background-color: var(--background2);
+    border-radius: 8px;
+    border: 1px solid var(--background2-border);
+    margin-bottom: 15px;
+}
+
+.recent-link-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+}
+
+.recent-link-header strong {
+    color: var(--text1);
+}
+
+.warning-badge {
+    font-size: 1.2em;
+}
+
+.recent-link-url {
+    color: var(--text2);
+    font-size: 0.9rem;
+    margin-bottom: 8px;
+    word-break: break-all;
+}
+
+.recent-link-meta {
+    color: var(--text3);
+    font-size: 0.8rem;
+}
+
+/* Traffic Sources */
+.referrer-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 15px;
+    background-color: var(--background2);
+    border-radius: 8px;
+    border: 1px solid var(--background2-border);
+    margin-bottom: 12px;
+}
+
+.referrer-name {
+    color: var(--text1);
+    font-weight: 500;
+}
+
+.referrer-count {
+    color: var(--rust3);
+    font-weight: 600;
+}
+
+/* Popular Link Highlight */
+.stats-section.highlight {
+    background: linear-gradient(135deg, var(--rust3), var(--rust2));
+    color: white;
+    border: none;
+}
+
+.stats-section.highlight h2 {
+    color: white;
+    margin-bottom: 15px;
+}
+
+.popular-link strong {
+    font-size: 1.3rem;
+    display: block;
+    margin-bottom: 8px;
+}
+
+.popular-link p {
+    margin: 0;
+    opacity: 0.9;
+}
+
 /* Responsive design */
+@media (max-width: 1024px) {
+    .stats-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+}
+
 @media (max-width: 768px) {
-    #stats {
+    #basic-stats {
         grid-template-columns: 1fr;
         padding: 15px;
         gap: 15px;
@@ -52,7 +299,23 @@
     .stat-container {
         padding: 16px;
     }
-}
-.stat-name{
-    text-transform: uppercase;
+    
+    .stats-section {
+        padding: 20px;
+        margin-bottom: 25px;
+    }
+    
+    .trend-chart {
+        height: 150px;
+    }
+    
+    .link-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+    
+    .rank {
+        margin-right: 0;
+    }
 }

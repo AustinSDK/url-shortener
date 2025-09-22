@@ -14,20 +14,163 @@
     <div class="dashboard-container">
         <%- include("partials/sidebar.ejs") %>
         <div id="main">
-            <h1>Stats</h1>
-            <div id="stats">
-                <% Object.entries(stats).forEach(([key, value], idx) => { %>
-                    <div id="stat-container-<%= idx + 1 %>" class="stat-container">
-                        <h3 class="stat-name">
-                            <%= key %>
-                        </h3>
-                        <p class="stat-info">
-                            <%= value %>
-                        </p>
+            <h1>Dashboard Statistics</h1>
+            
+            <!-- Basic Metrics -->
+            <section class="stats-section">
+                <h2>Overview</h2>
+                <div id="basic-stats">
+                    <% Object.entries(dashboardData.basicStats).forEach(([key, value], idx) => { %>
+                        <div id="stat-container-<%= idx + 1 %>" class="stat-container">
+                            <h3 class="stat-name">
+                                <%= key %>
+                            </h3>
+                            <p class="stat-info">
+                                <%= value %>
+                            </p>
+                        </div>
+                    <% }); %>
+                </div>
+            </section>
+
+            <!-- Click Trends -->
+            <% if (dashboardData.clickTrends && dashboardData.clickTrends.length > 0) { %>
+            <section class="stats-section">
+                <h2>Click Trends (Last 7 Days)</h2>
+                <div class="chart-container">
+                    <div class="trend-chart">
+                        <% 
+                        const maxClicks = Math.max(...dashboardData.clickTrends.map(d => d.clicks));
+                        dashboardData.clickTrends.forEach(day => { 
+                            const barHeight = Math.max(20, (day.clicks / maxClicks) * 100);
+                        %>
+                            <div class="trend-bar">
+                                <div class="bar" data-height="<%= barHeight %>">
+                                    <span class="bar-value"><%= day.clicks %></span>
+                                </div>
+                                <span class="bar-label"><%= day.day %></span>
+                            </div>
+                        <% }); %>
                     </div>
-                <% }); %>
+                </div>
+            </section>
+            <% } %>
+
+            <!-- Two-column layout for detailed stats -->
+            <div class="stats-grid">
+                <!-- Top Links -->
+                <% if (dashboardData.topLinks && dashboardData.topLinks.length > 0) { %>
+                <section class="stats-section">
+                    <h2>Top Performing Links</h2>
+                    <div class="top-links">
+                        <% dashboardData.topLinks.forEach((link, index) => { %>
+                            <div class="link-item">
+                                <span class="rank">#<%= index + 1 %></span>
+                                <div class="link-details">
+                                    <strong>/u/<%= link.short %></strong>
+                                    <div class="link-url"><%= link.url.length > 40 ? link.url.substring(0, 40) + '...' : link.url %></div>
+                                </div>
+                                <span class="click-count"><%= link.clicks %> clicks</span>
+                            </div>
+                        <% }); %>
+                    </div>
+                </section>
+                <% } %>
+
+                <!-- Browser Statistics -->
+                <% if (dashboardData.browserStats && dashboardData.browserStats.length > 0) { %>
+                <section class="stats-section">
+                    <h2>Browser Distribution</h2>
+                    <div class="browser-stats">
+                        <% dashboardData.browserStats.forEach(browser => { %>
+                            <div class="browser-item">
+                                <div class="browser-info">
+                                    <span class="browser-name"><%= browser.browser %></span>
+                                    <span class="browser-percentage"><%= browser.percentage %>%</span>
+                                </div>
+                                <div class="browser-bar">
+                                    <div class="browser-fill" data-width="<%= browser.percentage %>"></div>
+                                </div>
+                                <span class="browser-count"><%= browser.count %> clicks</span>
+                            </div>
+                        <% }); %>
+                    </div>
+                </section>
+                <% } %>
+
+                <!-- Recent Links -->
+                <% if (dashboardData.recentLinks && dashboardData.recentLinks.length > 0) { %>
+                <section class="stats-section">
+                    <h2>Recent Links</h2>
+                    <div class="recent-links">
+                        <% dashboardData.recentLinks.forEach(link => { %>
+                            <div class="recent-link-item">
+                                <div class="recent-link-header">
+                                    <strong>/u/<%= link.short %></strong>
+                                    <% if (link.warning) { %>
+                                        <span class="warning-badge">⚠️</span>
+                                    <% } %>
+                                </div>
+                                <div class="recent-link-url"><%= link.url.length > 50 ? link.url.substring(0, 50) + '...' : link.url %></div>
+                                <div class="recent-link-meta">
+                                    by <em><%= link.username %></em> • <%= new Date(link.created_at).toLocaleDateString() %>
+                                </div>
+                            </div>
+                        <% }); %>
+                    </div>
+                </section>
+                <% } %>
+
+                <!-- Traffic Sources -->
+                <% if (dashboardData.referrerStats && dashboardData.referrerStats.length > 0) { %>
+                <section class="stats-section">
+                    <h2>Traffic Sources</h2>
+                    <div class="referrer-stats">
+                        <% dashboardData.referrerStats.forEach(referrer => { %>
+                            <div class="referrer-item">
+                                <span class="referrer-name">
+                                    <%= referrer.refer_link === 'Direct' ? '🔗 Direct' : 
+                                        referrer.refer_link === 'google.com' ? '🔍 Google' :
+                                        referrer.refer_link === 'twitter.com' ? '🐦 Twitter' :
+                                        referrer.refer_link === 'facebook.com' ? '👥 Facebook' :
+                                        '🌐 ' + referrer.refer_link %>
+                                </span>
+                                <span class="referrer-count"><%= referrer.count %> visits</span>
+                            </div>
+                        <% }); %>
+                    </div>
+                </section>
+                <% } %>
             </div>
+
+            <!-- Most Popular Link Highlight -->
+            <% if (dashboardData.mostPopular) { %>
+            <section class="stats-section highlight">
+                <h2>🏆 Most Popular Link</h2>
+                <div class="popular-link">
+                    <strong>/u/<%= dashboardData.mostPopular %></strong>
+                    <p>This link is leading the pack with the most clicks!</p>
+                </div>
+            </section>
+            <% } %>
         </div>
     </div>
+    
+    <script>
+        // Set dynamic heights and widths using data attributes
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set bar heights for trend chart
+            document.querySelectorAll('.bar[data-height]').forEach(bar => {
+                const height = bar.getAttribute('data-height');
+                bar.style.height = height + '%';
+            });
+            
+            // Set browser bar widths
+            document.querySelectorAll('.browser-fill[data-width]').forEach(fill => {
+                const width = fill.getAttribute('data-width');
+                fill.style.width = width + '%';
+            });
+        });
+    </script>
 </body>
 </html>
