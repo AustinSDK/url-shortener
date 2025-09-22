@@ -23,6 +23,18 @@ module.exports = class{
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 token TEXT NOT NULL UNIQUE
             );
+            CREATE TABLE IF NOT EXISTS short_statistics (
+                id INTEGER PRIMARY KEY,
+                hashed_ip TEXT NOT NULL,
+                FOREIGN KEY (id) REFERENCES short_urls (id)
+            );
+            CREATE TABLE IF NOT EXISTS ss_click (
+                id INTEGER PRIMARY KEY,
+                browser TEXT DEFAULT "unknown",
+                refer_link TEXT DEFAULT "uknown",
+                date DATETIME DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (id) REFERENCES short_statistics (id)
+            );
         `);
     }
     constructor(path){

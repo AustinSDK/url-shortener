@@ -1,0 +1,13 @@
+#main{
+    text-align: center;
+}
+div.container{
+    width: max-content;
+    margin: 0 auto;
+    min-width: 40%;
+    max-width: 55%;
+    margin-top: 10px;
+    padding: 20px;
+    border-radius: 5px;
+    color: var(--rust2)
+}

@@ -162,9 +162,29 @@ app.get("/u/:short",(req,res,next)=>{
         return res.send("invalid url")
     }
     if (_short.warning === 1){
-        return res.send("extra check")
+        res.cookie("_redirect",_short.url)
+        return res.redirect("/approve")
     }
     res.redirect(_short.url)
+})
+app.get("/approve",(req,res,next)=>{
+    if (!req.cookies || !req.cookies._redirect){
+        return res.redirect("/404")
+    }
+    // Prevent XSS by encoding the URL before rendering
+    const rawUrl = req.cookies._redirect;
+    // Only allow http/https URLs and block javascript: etc.
+    let safeUrl = "No URL found, or invalid url format found.";
+    try {
+        const parsed = new URL(rawUrl);
+        if (parsed.protocol === "http:" || parsed.protocol === "https:") {
+            safeUrl = encodeURI(rawUrl);
+        }
+    } catch (e) {
+        safeUrl = "No URL found, or invalid url format found.";
+    }
+    // Prevent CSRF: this endpoint only reads a cookie and renders a page, but if you later POST to approve, use CSRF tokens!
+    res.render("approve.ejs", { link: safeUrl });
 })
 
 // cool login stuff ig
@@ -211,7 +231,7 @@ app.get("/dashboard/links", (req, res, next) => {
 app.get("/dashboard/link/:short", (req, res, next) => {
     const link = db.getShort(req.params.short);
     if (!link) {
-        return res.status(404).render("404.ejs", { user: req.user, test: test });
+        return next();
     }
     
     // Check if user owns the link or has admin permissions
@@ -258,10 +278,10 @@ app.get("/dashboard/link/:short", (req, res, next) => {
 });
 
 // Edit link endpoint
-app.post("/api/link/:short/edit", (req, res) => {
+app.post("/api/link/:short/edit", (req, res, next) => {
     const link = db.getShort(req.params.short);
     if (!link) {
-        return res.status(404).json({ success: false, message: "Link not found" });
+        return next()
     }
     
     // Check permissions
@@ -290,10 +310,10 @@ app.post("/api/link/:short/edit", (req, res) => {
 });
 
 // Delete link endpoint
-app.delete("/api/link/:short", (req, res) => {
+app.delete("/api/link/:short", (req, res, next) => {
     const link = db.getShort(req.params.short);
     if (!link) {
-        return res.status(404).json({ success: false, message: "Link not found" });
+        return next();
     }
     
     // Check permissions
@@ -319,6 +339,10 @@ if (test){
         res.json(req.user)
     })
 }
+
+app.get(/.*/, (req, res) => {
+    res.status(404).render("404.ejs", { user: req.user, test: test });
+});
 
 // listen
 

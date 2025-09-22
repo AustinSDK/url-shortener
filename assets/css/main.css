@@ -61,3 +61,9 @@ button {
 button:hover {
     background-color: var(--rust2);
 }
+
+.container{
+    background-color: var(--background3);
+    border: 1px var(--background3-border) solid;
+    color: var(--text2-muted);
+}
