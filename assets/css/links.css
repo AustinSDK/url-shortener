@@ -66,3 +66,9 @@
 .link-info > .link{
     color: var(--text1-muted);
 }
+
+.btn.btn-secondary{
+    margin: 0 auto;
+    text-align: center;
+    display: block;
+}

@@ -15,6 +15,7 @@
         <%- include("partials/sidebar.ejs") %>
         <div id="main">
             <h1>Links</h1>
+            <button class="btn btn-secondary" onclick="createNewUrl()">Create new url shorten</button>
             <div id="links">
                 <% links.forEach(link => { %>
                     <a href="/dashboard/link/<%= link.short %>">
@@ -34,3 +35,8 @@
     </div>
 </body>
 </html>
+<script>
+    function createNewUrl(){
+        document.location.href = "create"
+    }
+</script>

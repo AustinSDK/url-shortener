@@ -67,3 +67,31 @@ button:hover {
     border: 1px var(--background3-border) solid;
     color: var(--text2-muted);
 }
+
+/* cool buttons */
+.btn {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+.btn-primary {
+    background: var(--rust3);
+    color: white;
+}
+.btn-primary:hover {
+    background: var(--rust2);
+}
+.btn-secondary {
+    background: var(--background3);
+    color: var(--text1);
+    border: 1px solid var(--background3-border);
+}
+.btn-secondary:hover {
+    background: var(--background1);
+}
