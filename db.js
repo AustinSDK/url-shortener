@@ -497,4 +497,141 @@ module.exports = class{
             return trends;
         }
     }
+
+    // Admin-specific methods
+    getAllUsers() {
+        try {
+            const result = this.db.prepare(`
+                SELECT DISTINCT username 
+                FROM short_urls 
+                ORDER BY username
+            `).all();
+            return result.map(row => row.username);
+        } catch (error) {
+            console.log('Error getting all users:', error);
+            return [];
+        }
+    }
+
+    getTotalUsersCount() {
+        try {
+            const result = this.db.prepare(`
+                SELECT COUNT(DISTINCT username) as count 
+                FROM short_urls
+            `).get();
+            return result ? result.count : 0;
+        } catch (error) {
+            console.log('Error getting total users count:', error);
+            return 0;
+        }
+    }
+
+    getRecentUsers(limit = 10) {
+        try {
+            const result = this.db.prepare(`
+                SELECT username, MAX(created_at) as last_activity
+                FROM short_urls 
+                GROUP BY username
+                ORDER BY last_activity DESC 
+                LIMIT ?
+            `).all(limit);
+            return result.map(row => row.username);
+        } catch (error) {
+            console.log('Error getting recent users:', error);
+            return [];
+        }
+    }
+
+    getAllTopLinks(limit = 10) {
+        try {
+            const results = this.db.prepare(`
+                SELECT su.short, su.url, su.username, su.warning, su.created_at, COUNT(c.id) as clicks
+                FROM short_urls su 
+                LEFT JOIN clicks c ON su.id = c.short_url_id 
+                GROUP BY su.id 
+                ORDER BY clicks DESC, su.created_at DESC 
+                LIMIT ?
+            `).all(limit);
+            return results || [];
+        } catch (error) {
+            console.log('Error getting all top links:', error);
+            return [];
+        }
+    }
+
+    getAllRecentLinks(limit = 20) {
+        try {
+            return this.db.prepare(`
+                SELECT short, url, created_at, warning, username 
+                FROM short_urls 
+                ORDER BY created_at DESC 
+                LIMIT ?
+            `).all(limit);
+        } catch (error) {
+            console.log('Error getting all recent links:', error);
+            return [];
+        }
+    }
+
+    getLinksWithWarnings(limit = 20) {
+        try {
+            return this.db.prepare(`
+                SELECT short, url, created_at, warning, username 
+                FROM short_urls 
+                WHERE warning = 1
+                ORDER BY created_at DESC 
+                LIMIT ?
+            `).all(limit);
+        } catch (error) {
+            console.log('Error getting links with warnings:', error);
+            return [];
+        }
+    }
+
+    getUserLinksCount(username) {
+        try {
+            const result = this.db.prepare(`
+                SELECT COUNT(*) as count 
+                FROM short_urls 
+                WHERE username = ?
+            `).get(username);
+            return result ? result.count : 0;
+        } catch (error) {
+            console.log('Error getting user links count:', error);
+            return 0;
+        }
+    }
+
+    getAllUsersWithLinks() {
+        try {
+            const users = this.db.prepare(`
+                SELECT username, COUNT(*) as link_count, MAX(created_at) as last_activity
+                FROM short_urls 
+                GROUP BY username
+                ORDER BY last_activity DESC
+            `).all();
+            
+            // For each user, get their links
+            const usersWithLinks = users.map(user => {
+                const links = this.db.prepare(`
+                    SELECT short, url, created_at, warning 
+                    FROM short_urls 
+                    WHERE username = ?
+                    ORDER BY created_at DESC
+                `).all(user.username);
+                
+                return {
+                    username: user.username,
+                    linkCount: user.link_count,
+                    lastActivity: user.last_activity,
+                    links: links
+                };
+            });
+            
+            return usersWithLinks;
+        } catch (error) {
+            console.log('Error getting all users with links:', error);
+            return [];
+        }
+    }
 }

@@ -523,6 +523,59 @@ app.delete("/api/link/:short", (req, res, next) => {
     }
 });
 
+// Admin panel route
+app.get("/admin", (req, res, next) => {
+    if (!req.user) {
+        return res.redirect("/login");
+    }
+    
+    // Check if user is admin
+    if (!req.user.permissions.includes("admin") && !req.user.permissions.includes("url-admin")) {
+        return res.status(403).render("403.ejs", { user: req.user, test: test });
+    }
+    
+    try {
+        // Gather admin statistics
+        const adminData = {
+            // Basic stats
+            totalUsers: db.getTotalUsersCount(),
+            totalLinks: db.getTotalLinksCount(),
+            totalClicks: db.getTotalClicksCount(),
+            linksToday: db.getLinksCreatedToday(),
+            
+            // Users with their links for dropdown tables
+            usersWithLinks: db.getAllUsersWithLinks(),
+            
+            // Links data
+            allRecentLinks: db.getAllRecentLinks(15),
+            topLinks: db.getAllTopLinks(10),
+        };
+        
+        res.render("admin.ejs", { 
+            adminData, 
+            user: req.user, 
+            test: test 
+        });
+    } catch (error) {
+        console.error('Error loading admin panel:', error);
+        // Fallback to basic data on error
+        const adminData = {
+            totalUsers: 0,
+            totalLinks: 0,
+            totalClicks: 0,
+            linksToday: 0,
+            usersWithLinks: [],
+            allRecentLinks: [],
+            topLinks: []
+        };
+        res.render("admin.ejs", { 
+            adminData, 
+            user: req.user, 
+            test: test 
+        });
+    }
+});
+
 if (test){
     app.get("/me",(req,res,next)=>{
         res.json(req.user)

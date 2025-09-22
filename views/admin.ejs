@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel</title>
+    <link rel="stylesheet" href="/css/colors.css">
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/dashboard.css">
+    <link rel="stylesheet" href="/css/stats.css">
+    <style>
+        .admin-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .admin-section {
+            margin-bottom: 30px;
+            background: var(--background2);
+            border-radius: 8px;
+            padding: 20px;
+            border: 1px solid var(--background2-border);
+        }
+        .admin-section h2 {
+            color: var(--text1);
+            border-bottom: 2px solid var(--rust1);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        .quick-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        .quick-stat {
+            background: var(--background3);
+            border: 1px solid var(--background3-border);
+            color: var(--text1);
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .quick-stat h3 {
+            margin: 0 0 10px 0;
+            font-size: 2em;
+            color: var(--rust1);
+        }
+        .quick-stat p {
+            margin: 0;
+            color: var(--text1-muted);
+        }
+        
+        /* User dropdown styles */
+        .user-dropdown {
+            margin-bottom: 15px;
+            background: var(--background1);
+            border: 1px solid var(--background1-border);
+            border-radius: 6px;
+            overflow: hidden;
+        }
+        .user-header {
+            padding: 15px;
+            background: var(--background2);
+            border-bottom: 1px solid var(--background2-border);
+            cursor: pointer;
+            user-select: none;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background-color 0.2s;
+        }
+        .user-header:hover {
+            background: var(--background3);
+        }
+        .user-info {
+            color: var(--text1);
+        }
+        .user-stats {
+            color: var(--text1-muted);
+            font-size: 0.9em;
+        }
+        .dropdown-arrow {
+            color: var(--rust1);
+            font-size: 1.2em;
+            transition: transform 0.2s;
+        }
+        .user-dropdown.expanded .dropdown-arrow {
+            transform: rotate(90deg);
+        }
+        .user-links {
+            display: none;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .user-dropdown.expanded .user-links {
+            display: block;
+        }
+        .link-row {
+            padding: 10px 15px;
+            border-bottom: 1px solid var(--background1-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .link-row:last-child {
+            border-bottom: none;
+        }
+        .link-row:nth-child(even) {
+            background: var(--background1);
+        }
+        .link-info {
+            flex: 1;
+        }
+        .link-short {
+            color: var(--text1);
+            font-weight: bold;
+        }
+        .link-url {
+            color: var(--text1-muted);
+            font-size: 0.9em;
+            margin-top: 2px;
+        }
+        .link-date {
+            color: var(--text2-muted);
+            font-size: 0.8em;
+            margin-top: 2px;
+        }
+        .link-actions {
+            display: flex;
+            gap: 8px;
+        }
+        .admin-btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 11px;
+            font-weight: bold;
+            transition: all 0.2s;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .btn-view {
+            background: var(--rust1);
+            color: white;
+        }
+        .btn-view:hover {
+            background: var(--rust2);
+            color: white;
+        }
+        .btn-danger {
+            background: var(--rust3);
+            color: var(--background1);
+        }
+        .btn-danger:hover {
+            background: var(--rust2);
+            color: white;
+        }
+        
+        /* Global stats and recent links */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        .recent-link-item {
+            padding: 12px;
+            background: var(--background1);
+            border: 1px solid var(--background1-border);
+            border-radius: 6px;
+            margin-bottom: 8px;
+        }
+        .recent-link-header {
+            color: var(--text1);
+            font-weight: bold;
+        }
+        .recent-link-url {
+            color: var(--text1-muted);
+            font-size: 0.9em;
+            margin: 4px 0;
+        }
+        .recent-link-meta {
+            color: var(--text2-muted);
+            font-size: 0.8em;
+        }
+        .top-link-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            background: var(--background1);
+            border: 1px solid var(--background1-border);
+            border-radius: 6px;
+            margin-bottom: 8px;
+        }
+        .top-link-info {
+            flex: 1;
+        }
+        .top-link-rank {
+            color: var(--rust1);
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        .top-link-short {
+            color: var(--text1);
+            font-weight: bold;
+        }
+        .top-link-url {
+            color: var(--text1-muted);
+            font-size: 0.9em;
+        }
+        .top-link-meta {
+            color: var(--text2-muted);
+            font-size: 0.8em;
+        }
+        .click-count {
+            color: var(--rust1);
+            font-weight: bold;
+        }
+        
+        @media (max-width: 768px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <%- include("partials/header.ejs",{user:user, test:test}) %>
+    <div class="admin-container">
+        <h1 style="color: var(--text1); text-align: center; margin-bottom: 30px;">
+            Admin Panel
+        </h1>
+        
+        <!-- Global Statistics -->
+        <div class="quick-stats">
+            <div class="quick-stat">
+                <h3><%= adminData.totalUsers %></h3>
+                <p>Total Users</p>
+            </div>
+            <div class="quick-stat">
+                <h3><%= adminData.totalLinks %></h3>
+                <p>Total Links</p>
+            </div>
+            <div class="quick-stat">
+                <h3><%= adminData.totalClicks %></h3>
+                <p>Total Clicks</p>
+            </div>
+            <div class="quick-stat">
+                <h3><%= adminData.linksToday %></h3>
+                <p>Links Today</p>
+            </div>
+        </div>
+
+        <!-- Users with their Links -->
+        <section class="admin-section">
+            <h2>All Users and Their Links</h2>
+            <% if (adminData.usersWithLinks && adminData.usersWithLinks.length > 0) { %>
+                <% adminData.usersWithLinks.forEach((userEntry, index) => { %>
+                    <div class="user-dropdown" id="user-<%= index %>">
+                        <div class="user-header" onclick="toggleUserDropdown(<%= index %>)">
+                            <div>
+                                <div class="user-info"><%= userEntry.username %></div>
+                                <div class="user-stats">
+                                    <%= userEntry.linkCount %> links • Last activity: <%= new Date(userEntry.lastActivity).toLocaleDateString() %>
+                                </div>
+                            </div>
+                            <div class="dropdown-arrow">▶</div>
+                        </div>
+                        <div class="user-links">
+                            <% if (userEntry.links && userEntry.links.length > 0) { %>
+                                <% userEntry.links.forEach(link => { %>
+                                    <div class="link-row">
+                                        <div class="link-info">
+                                            <div class="link-short">/u/<%= link.short %></div>
+                                            <div class="link-url">
+                                                <%= link.url.length > 60 ? link.url.substring(0, 60) + '...' : link.url %>
+                                            </div>
+                                            <div class="link-date">
+                                                Created: <%= new Date(link.created_at).toLocaleDateString() %>
+                                            </div>
+                                        </div>
+                                        <div class="link-actions">
+                                            <a href="/dashboard/link/<%= link.short %>" target="_blank" class="admin-btn btn-view">View</a>
+                                            <button class="admin-btn btn-danger" onclick="deleteLink('<%= link.short %>')">Delete</button>
+                                        </div>
+                                    </div>
+                                <% }); %>
+                            <% } else { %>
+                                <div class="link-row">
+                                    <div style="color: var(--text1-muted); text-align: center; padding: 20px;">
+                                        No links found for this user
+                                    </div>
+                                </div>
+                            <% } %>
+                        </div>
+                    </div>
+                <% }); %>
+            <% } else { %>
+                <div style="color: var(--text1-muted); text-align: center; padding: 40px;">
+                    No users found
+                </div>
+            <% } %>
+        </section>
+
+        <div class="stats-grid">
+            <!-- Recent Links -->
+            <section class="admin-section">
+                <h2>Recent Links (Global)</h2>
+                <% if (adminData.allRecentLinks && adminData.allRecentLinks.length > 0) { %>
+                    <% adminData.allRecentLinks.forEach(link => { %>
+                        <div class="recent-link-item">
+                            <div class="recent-link-header">/u/<%= link.short %></div>
+                            <div class="recent-link-url">
+                                <%= link.url.length > 50 ? link.url.substring(0, 50) + '...' : link.url %>
+                            </div>
+                            <div class="recent-link-meta">
+                                by <%= link.username %> • <%= new Date(link.created_at).toLocaleDateString() %>
+                            </div>
+                        </div>
+                    <% }); %>
+                <% } else { %>
+                    <div style="color: var(--text1-muted); text-align: center; padding: 20px;">
+                        No recent links found
+                    </div>
+                <% } %>
+            </section>
+
+            <!-- Top Links -->
+            <section class="admin-section">
+                <h2>Top Performing Links</h2>
+                <% if (adminData.topLinks && adminData.topLinks.length > 0) { %>
+                    <% adminData.topLinks.forEach((link, index) => { %>
+                        <div class="top-link-item">
+                            <div style="display: flex; align-items: center;">
+                                <span class="top-link-rank">#<%= index + 1 %></span>
+                                <div class="top-link-info">
+                                    <div class="top-link-short">/u/<%= link.short %></div>
+                                    <div class="top-link-url">
+                                        <%= link.url.length > 40 ? link.url.substring(0, 40) + '...' : link.url %>
+                                    </div>
+                                    <div class="top-link-meta">by <%= link.username %></div>
+                                </div>
+                            </div>
+                            <div class="click-count"><%= link.clicks %> clicks</div>
+                        </div>
+                    <% }); %>
+                <% } else { %>
+                    <div style="color: var(--text1-muted); text-align: center; padding: 20px;">
+                        No top links data available
+                    </div>
+                <% } %>
+            </section>
+        </div>
+
+        <!-- System Info -->
+        <section class="admin-section">
+            <h2>System Information</h2>
+            <div style="color: var(--text1-muted);">
+                <p><strong style="color: var(--text1);">Server Time:</strong> <%= new Date().toLocaleString() %></p>
+                <p><strong style="color: var(--text1);">Admin User:</strong> <%= user.username %></p>
+                <p><strong style="color: var(--text1);">Test Mode:</strong> <%= test ? 'Enabled' : 'Disabled' %></p>
+            </div>
+        </section>
+    </div>
+    
+    <script>
+        function toggleUserDropdown(index) {
+            const dropdown = document.getElementById('user-' + index);
+            dropdown.classList.toggle('expanded');
+        }
+        
+        function deleteLink(short) {
+            if (confirm('Are you sure you want to delete the link /' + short + '? This action cannot be undone.')) {
+                fetch('/api/link/' + short, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Link deleted successfully');
+                        location.reload();
+                    } else {
+                        alert('Error deleting link: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    alert('Error deleting link: ' + error);
+                });
+            }
+        }
+    </script>
+</body>
+</html>
