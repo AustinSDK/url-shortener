@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Link Details - <%= link.short %></title>
+    <link rel="stylesheet" href="/css/colors.css">
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/dashboard.css">
+    <link rel="stylesheet" href="/css/link.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <style>
+        .link-detail-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 30px;
+        }
+
+        .main-content {
+            background: var(--background2);
+            border: 1px solid var(--background2-border);
+            border-radius: 12px;
+            padding: 30px;
+        }
+
+        .link-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .link-title {
+            color: var(--text1);
+            font-size: 2rem;
+            margin: 0;
+            text-transform: uppercase;
+            font-weight: 700;
+        }
+
+        .link-status {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-owner {
+            background: var(--rust3);
+            color: white;
+        }
+
+        .status-admin {
+            background: var(--background3);
+            color: var(--text1);
+            border: 1px solid var(--background3-border);
+        }
+
+        .status-warning {
+            background: #ff6b6b;
+            color: white;
+        }
+
+        .link-details {
+            display: grid;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .detail-item {
+            padding: 20px;
+            background: var(--background1);
+            border: 1px solid var(--background1-border);
+            border-radius: 8px;
+        }
+
+        .detail-label {
+            font-weight: 600;
+            color: var(--rust3);
+            font-size: 0.9rem;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .detail-value {
+            color: var(--text1);
+            font-size: 1.1rem;
+            word-break: break-all;
+            line-height: 1.4;
+        }
+
+        .detail-value.url {
+            text-decoration: underline;
+            color: var(--text2);
+        }
+
+        .stats-sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .stats-card {
+            background: var(--background2);
+            border: 1px solid var(--background2-border);
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        .stats-title {
+            color: var(--text1);
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin: 0 0 15px 0;
+            text-transform: uppercase;
+        }
+
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--background1-border);
+        }
+
+        .stat-item:last-child {
+            border-bottom: none;
+        }
+
+        .stat-label {
+            color: var(--text2);
+            font-weight: 500;
+        }
+
+        .stat-value {
+            color: var(--rust3);
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .chart-placeholder {
+            height: 150px;
+            background: var(--background1);
+            border: 2px dashed var(--background1-border);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text2);
+            font-style: italic;
+            margin-top: 15px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 25px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: var(--rust3);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--rust2);
+        }
+
+        .btn-secondary {
+            background: var(--background3);
+            color: var(--text1);
+            border: 1px solid var(--background3-border);
+        }
+
+        .btn-secondary:hover {
+            background: var(--background1);
+        }
+
+        .btn-danger {
+            background: #ff6b6b;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #ff5252;
+        }
+
+        .referrer-list {
+            margin-top: 10px;
+        }
+
+        .referrer-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--background1-border);
+        }
+
+        .referrer-item:last-child {
+            border-bottom: none;
+        }
+
+        .browser-chart {
+            margin-top: 15px;
+        }
+
+        .browser-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .browser-bar {
+            flex-grow: 1;
+            height: 6px;
+            background: var(--background1);
+            border-radius: 3px;
+            margin: 0 10px;
+            overflow: hidden;
+        }
+
+        .browser-fill {
+            height: 100%;
+            background: var(--rust3);
+            border-radius: 3px;
+            transition: width 0.5s ease;
+        }
+
+        @media (max-width: 768px) {
+            .link-detail-container {
+                grid-template-columns: 1fr;
+                gap: 20px;
+                padding: 15px;
+            }
+            
+            .main-content {
+                padding: 20px;
+            }
+            
+            .link-header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <%- include("../partials/header.ejs", {user: user, test: test}) %>
+    
+    <div class="dashboard-container">
+        <%- include("partials/sidebar.ejs") %>
+        
+        <div id="main">
+            <div class="link-detail-container">
+                <div class="main-content">
+                    <div class="link-header">
+                        <h1 class="link-title"><%= link.short %></h1>
+                        <div class="link-status">
+                            <% if (isOwner) { %>
+                                <span class="status-badge status-owner">Owner</span>
+                            <% } %>
+                            <% if (isAdmin && !isOwner) { %>
+                                <span class="status-badge status-admin">Admin Access</span>
+                            <% } %>
+                            <% if (link.warning) { %>
+                                <span class="status-badge status-warning">Warning Enabled</span>
+                            <% } %>
+                        </div>
+                    </div>
+
+                    <div class="link-details">
+                        <div class="detail-item">
+                            <div class="detail-label">Short URL</div>
+                            <div class="detail-value">
+                                <a href="/u/<%= link.short %>" target="_blank" rel="noopener">
+                                    u/<%= link.short %>
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="detail-item">
+                            <div class="detail-label">Destination URL</div>
+                            <div class="detail-value url">
+                                <a href="<%= link.url %>" target="_blank" rel="noopener"><%= link.url %></a>
+                            </div>
+                        </div>
+
+                        <div class="detail-item">
+                            <div class="detail-label">Created</div>
+                            <div class="detail-value">
+                                <%= new Date(link.created_at).toLocaleDateString('en-US', { 
+                                    weekday: 'long', 
+                                    year: 'numeric', 
+                                    month: 'long', 
+                                    day: 'numeric',
+                                    hour: '2-digit',
+                                    minute: '2-digit'
+                                }) %>
+                            </div>
+                        </div>
+
+                        <% if (isAdmin || isOwner) { %>
+                            <div class="detail-item">
+                                <div class="detail-label">Owner</div>
+                                <div class="detail-value"><%= link.username %></div>
+                            </div>
+                        <% } %>
+                    </div>
+
+                    <div class="action-buttons">
+                        <a href="/u/<%= link.short %>" target="_blank" class="btn btn-primary">Visit Link</a>
+                        <button onclick="copyToClipboard('/u/<%= link.short %>')" class="btn btn-secondary">Copy URL</button>
+                        <% if (isOwner || isAdmin) { %>
+                            <button onclick="editLink()" class="btn btn-secondary">Edit</button>
+                            <button onclick="deleteLink()" class="btn btn-danger">Delete</button>
+                        <% } %>
+                    </div>
+                </div>
+
+                <div class="stats-sidebar">
+                    <div class="stats-card">
+                        <h3 class="stats-title">Click Statistics</h3>
+                        <div class="stat-item">
+                            <span class="stat-label">Total Clicks</span>
+                            <span class="stat-value"><%= stats.totalClicks.toLocaleString() %></span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Today</span>
+                            <span class="stat-value"><%= stats.todayClicks %></span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">This Week</span>
+                            <span class="stat-value"><%= stats.thisWeekClicks %></span>
+                        </div>
+                        <div class="chart-placeholder">
+                            📈 Click History Chart
+                        </div>
+                    </div>
+
+                    <div class="stats-card">
+                        <h3 class="stats-title">Top Referrers</h3>
+                        <div class="referrer-list">
+                            <% stats.topReferrers.forEach(referrer => { %>
+                                <div class="referrer-item">
+                                    <span><%= referrer.name %></span>
+                                    <span class="stat-value"><%= referrer.count %></span>
+                                </div>
+                            <% }) %>
+                        </div>
+                    </div>
+
+                    <div class="stats-card">
+                        <h3 class="stats-title">Browsers</h3>
+                        <div class="browser-chart">
+                            <% stats.browsers.forEach(browser => { %>
+                                <div class="browser-item">
+                                    <span style="font-size: 0.9rem;"><%= browser.name %></span>
+                                    <div class="browser-bar">
+                                        <div class="browser-fill" style="width: <%= browser.percentage %>%"></div>
+                                    </div>
+                                    <span class="stat-value" style="font-size: 0.9rem;"><%= browser.percentage %>%</span>
+                                </div>
+                            <% }) %>
+                        </div>
+                    </div>
+
+                    <div class="stats-card">
+                        <h3 class="stats-title">Recent Activity</h3>
+                        <% stats.clickHistory.slice(-3).forEach(day => { %>
+                            <div class="stat-item">
+                                <span class="stat-label"><%= day.date %></span>
+                                <span class="stat-value"><%= day.clicks %></span>
+                            </div>
+                        <% }) %>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function copyToClipboard(text) {
+            const fullUrl = window.location.origin + text;
+            navigator.clipboard.writeText(fullUrl).then(() => {
+                Toastify({
+                    text: "URL copied to clipboard! 📋",
+                    duration: 3000,
+                    gravity: "top",
+                    position: "right",
+                    style: {
+                        background: "linear-gradient(to right, #00b09b, #96c93d)",
+                    }
+                }).showToast();
+            }).catch(err => {
+                console.error('Failed to copy: ', err);
+                // Fallback for older browsers
+                const textArea = document.createElement('textarea');
+                textArea.value = fullUrl;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                Toastify({
+                    text: "URL copied to clipboard! 📋",
+                    duration: 3000,
+                    gravity: "top",
+                    position: "right",
+                    style: {
+                        background: "linear-gradient(to right, #00b09b, #96c93d)",
+                    }
+                }).showToast();
+            });
+        }
+
+        function editLink() {
+            // Create a modal-like overlay for editing
+            const overlay = document.createElement('div');
+            overlay.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.7);
+                z-index: 10001;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                backdrop-filter: blur(5px);
+            `;
+            
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                background: var(--background2);
+                border: 1px solid var(--background2-border);
+                border-radius: 12px;
+                padding: 30px;
+                max-width: 500px;
+                width: 90%;
+                max-height: 80vh;
+                overflow-y: auto;
+            `;
+            
+            modal.innerHTML = `
+                <h3 style="color: var(--text1); margin-top: 0; margin-bottom: 20px;">Edit Link</h3>
+                <form id="editForm">
+                    <div style="margin-bottom: 20px;">
+                        <label style="display: block; color: var(--rust3); font-weight: 600; margin-bottom: 8px;">Short Code</label>
+                        <input type="text" value="<%= link.short %>" disabled style="
+                            width: 100%;
+                            padding: 12px;
+                            border: 1px solid var(--background3-border);
+                            border-radius: 6px;
+                            background: var(--background1);
+                            color: var(--text2);
+                            font-family: monospace;
+                            box-sizing: border-box;
+                        ">
+                    </div>
+                    <div style="margin-bottom: 20px;">
+                        <label style="display: block; color: var(--rust3); font-weight: 600; margin-bottom: 8px;">Destination URL</label>
+                        <input type="url" id="editUrl" value="<%= link.url %>" required style="
+                            width: 100%;
+                            padding: 12px;
+                            border: 1px solid var(--background3-border);
+                            border-radius: 6px;
+                            background: var(--background1);
+                            color: var(--text1);
+                            box-sizing: border-box;
+                        ">
+                    </div>
+                    <div style="margin-bottom: 25px;">
+                        <label style="display: flex; align-items: center; gap: 8px; color: var(--text1); cursor: pointer;">
+                            <input type="checkbox" id="editWarning" <%= link.warning ? 'checked' : '' %> style="margin: 0;">
+                            Enable warning page
+                        </label>
+                    </div>
+                    <div style="display: flex; gap: 15px; justify-content: flex-end;">
+                        <button type="button" onclick="closeEditModal()" style="
+                            padding: 12px 24px;
+                            border: 1px solid var(--background3-border);
+                            border-radius: 6px;
+                            background: var(--background3);
+                            color: var(--text1);
+                            cursor: pointer;
+                        ">Cancel</button>
+                        <button type="submit" style="
+                            padding: 12px 24px;
+                            border: none;
+                            border-radius: 6px;
+                            background: var(--rust3);
+                            color: white;
+                            cursor: pointer;
+                        ">Save Changes</button>
+                    </div>
+                </form>
+            `;
+            
+            overlay.appendChild(modal);
+            document.body.appendChild(overlay);
+            
+            // Focus on URL input
+            setTimeout(() => {
+                document.getElementById('editUrl').focus();
+            }, 100);
+            
+            // Handle form submission
+            document.getElementById('editForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const url = document.getElementById('editUrl').value;
+                const warning = document.getElementById('editWarning').checked;
+                
+                try {
+                    const response = await fetch('/api/link/<%= link.short %>/edit', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ url, warning })
+                    });
+                    
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        Toastify({
+                            text: result.message + " ✅",
+                            duration: 3000,
+                            gravity: "top",
+                            position: "right",
+                            style: {
+                                background: "linear-gradient(to right, #00b09b, #96c93d)",
+                            }
+                        }).showToast();
+                        closeEditModal();
+                        // Reload page to show updated data
+                        setTimeout(() => window.location.reload(), 1000);
+                    } else {
+                        Toastify({
+                            text: result.message + " ❌",
+                            duration: 4000,
+                            gravity: "top",
+                            position: "right",
+                            style: {
+                                background: "linear-gradient(to right, #ff5f6d, #ffc371)",
+                            }
+                        }).showToast();
+                    }
+                } catch (error) {
+                    console.error('Edit error:', error);
+                    Toastify({
+                        text: "Failed to update link ❌",
+                        duration: 4000,
+                        gravity: "top",
+                        position: "right",
+                        style: {
+                            background: "linear-gradient(to right, #ff5f6d, #ffc371)",
+                        }
+                    }).showToast();
+                }
+            });
+            
+            // Close modal when clicking overlay
+            overlay.addEventListener('click', (e) => {
+                if (e.target === overlay) {
+                    closeEditModal();
+                }
+            });
+            
+            window.closeEditModal = () => {
+                document.body.removeChild(overlay);
+            };
+        }
+
+        function deleteLink() {
+            // Show confirmation with toast-style confirmation
+            const overlay = document.createElement('div');
+            overlay.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.7);
+                z-index: 10001;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                backdrop-filter: blur(5px);
+            `;
+            
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                background: var(--background2);
+                border: 1px solid var(--background2-border);
+                border-radius: 12px;
+                padding: 30px;
+                max-width: 400px;
+                width: 90%;
+                text-align: center;
+            `;
+            
+            modal.innerHTML = `
+                <div style="color: #f44336; font-size: 48px; margin-bottom: 20px;">🗑️</div>
+                <h3 style="color: var(--text1); margin: 0 0 15px 0;">Delete Link</h3>
+                <p style="color: var(--text2); margin-bottom: 25px; line-height: 1.5;">
+                    Are you sure you want to delete <strong style="color: var(--rust3);"><%= link.short %></strong>?<br>
+                    This action cannot be undone.
+                </p>
+                <div style="display: flex; gap: 15px; justify-content: center;">
+                    <button onclick="closeDeleteModal()" style="
+                        padding: 12px 24px;
+                        border: 1px solid var(--background3-border);
+                        border-radius: 6px;
+                        background: var(--background3);
+                        color: var(--text1);
+                        cursor: pointer;
+                    ">Cancel</button>
+                    <button onclick="confirmDelete()" style="
+                        padding: 12px 24px;
+                        border: none;
+                        border-radius: 6px;
+                        background: #f44336;
+                        color: white;
+                        cursor: pointer;
+                    ">Delete</button>
+                </div>
+            `;
+            
+            overlay.appendChild(modal);
+            document.body.appendChild(overlay);
+            
+            window.closeDeleteModal = () => {
+                document.body.removeChild(overlay);
+            };
+            
+            window.confirmDelete = async () => {
+                try {
+                    const response = await fetch('/api/link/<%= link.short %>', {
+                        method: 'DELETE'
+                    });
+                    
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        Toastify({
+                            text: result.message + " ✅",
+                            duration: 3000,
+                            gravity: "top",
+                            position: "right",
+                            style: {
+                                background: "linear-gradient(to right, #00b09b, #96c93d)",
+                            }
+                        }).showToast();
+                        closeDeleteModal();
+                        // Redirect to links page
+                        setTimeout(() => {
+                            window.location.href = '/dashboard/links';
+                        }, 1000);
+                    } else {
+                        Toastify({
+                            text: result.message + " ❌",
+                            duration: 4000,
+                            gravity: "top",
+                            position: "right",
+                            style: {
+                                background: "linear-gradient(to right, #ff5f6d, #ffc371)",
+                            }
+                        }).showToast();
+                        closeDeleteModal();
+                    }
+                } catch (error) {
+                    console.error('Delete error:', error);
+                    Toastify({
+                        text: "Failed to delete link ❌",
+                        duration: 4000,
+                        gravity: "top",
+                        position: "right",
+                        style: {
+                            background: "linear-gradient(to right, #ff5f6d, #ffc371)",
+                        }
+                    }).showToast();
+                    closeDeleteModal();
+                }
+            };
+            
+            // Close modal when clicking overlay
+            overlay.addEventListener('click', (e) => {
+                if (e.target === overlay) {
+                    closeDeleteModal();
+                }
+            });
+        }
+
+        // Animate browser bars on load
+        document.addEventListener('DOMContentLoaded', () => {
+            // Test that Toastify is loaded
+            if (typeof Toastify !== 'undefined') {
+                console.log('Toastify is loaded and ready!');
+            } else {
+                console.error('Toastify failed to load');
+            }
+            
+            const browserFills = document.querySelectorAll('.browser-fill');
+            setTimeout(() => {
+                browserFills.forEach(fill => {
+                    const width = fill.style.width;
+                    fill.style.width = '0%';
+                    setTimeout(() => {
+                        fill.style.width = width;
+                    }, 100);
+                });
+            }, 500);
+        });
+    </script>
+</body>
+</html>

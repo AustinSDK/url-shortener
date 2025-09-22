@@ -88,6 +88,8 @@ const userCache = {
 // setup
 
 let app = express();
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(async (req,res,next)=>{
     if (!req.cookies || !req.cookies.token){
@@ -206,6 +208,112 @@ app.get("/dashboard/links", (req, res, next) => {
     const links = db.getShortsByUsername(req.user.username)
     res.render("dashboard/links.ejs", { links:links,user:req.user, test:test });
 });
+app.get("/dashboard/link/:short", (req, res, next) => {
+    const link = db.getShort(req.params.short);
+    if (!link) {
+        return res.status(404).render("404.ejs", { user: req.user, test: test });
+    }
+    
+    // Check if user owns the link or has admin permissions
+    const canAccess = link.username === req.user.username || 
+                     req.user.permissions.includes("admin") || 
+                     req.user.permissions.includes("url-admin");
+    
+    if (!canAccess) {
+        return res.status(403).render("403.ejs", { user: req.user, test: test });
+    }
+    
+    // Mock stats data for easy backend editing
+    const mockStats = {
+        totalClicks: Math.floor(Math.random() * 1000) + 50,
+        todayClicks: Math.floor(Math.random() * 50) + 5,
+        thisWeekClicks: Math.floor(Math.random() * 200) + 20,
+        topReferrers: [
+            { name: "Direct", count: Math.floor(Math.random() * 100) + 10 },
+            { name: "Google", count: Math.floor(Math.random() * 80) + 5 },
+            { name: "Twitter", count: Math.floor(Math.random() * 60) + 3 },
+            { name: "Facebook", count: Math.floor(Math.random() * 40) + 2 }
+        ],
+        clickHistory: Array.from({length: 7}, (_, i) => ({
+            date: new Date(Date.now() - (6-i) * 24 * 60 * 60 * 1000).toLocaleDateString(),
+            clicks: Math.floor(Math.random() * 30) + 5
+        })),
+        browsers: [
+            { name: "Chrome", percentage: 65 },
+            { name: "Firefox", percentage: 18 },
+            { name: "Safari", percentage: 12 },
+            { name: "Edge", percentage: 5 }
+        ]
+    };
+    
+    res.render("dashboard/link.ejs", { 
+        link: link, 
+        user: req.user, 
+        test: test, 
+        stats: mockStats,
+        isOwner: link.username === req.user.username,
+        isAdmin: req.user.permissions.includes("admin") || req.user.permissions.includes("url-admin"),
+        req: req
+    });
+});
+
+// Edit link endpoint
+app.post("/api/link/:short/edit", (req, res) => {
+    const link = db.getShort(req.params.short);
+    if (!link) {
+        return res.status(404).json({ success: false, message: "Link not found" });
+    }
+    
+    // Check permissions
+    const canEdit = link.username === req.user.username || 
+                   req.user.permissions.includes("admin") || 
+                   req.user.permissions.includes("url-admin");
+    
+    if (!canEdit) {
+        return res.status(403).json({ success: false, message: "You don't have permission to edit this link" });
+    }
+    
+    const { url, warning } = req.body;
+    
+    // Validate input
+    if (!url || typeof url !== 'string') {
+        return res.status(400).json({ success: false, message: "Valid URL is required" });
+    }
+    
+    try {
+        db.modifyShort(link.id, req.params.short, url, link.username, warning ? 1 : 0);
+        res.json({ success: true, message: "Link updated successfully" });
+    } catch (error) {
+        console.error("Error updating link:", error);
+        res.status(500).json({ success: false, message: "Failed to update link" });
+    }
+});
+
+// Delete link endpoint
+app.delete("/api/link/:short", (req, res) => {
+    const link = db.getShort(req.params.short);
+    if (!link) {
+        return res.status(404).json({ success: false, message: "Link not found" });
+    }
+    
+    // Check permissions
+    const canDelete = link.username === req.user.username || 
+                     req.user.permissions.includes("admin") || 
+                     req.user.permissions.includes("url-admin");
+    
+    if (!canDelete) {
+        return res.status(403).json({ success: false, message: "You don't have permission to delete this link" });
+    }
+    
+    try {
+        db.removeShort(link.id);
+        res.json({ success: true, message: "Link deleted successfully" });
+    } catch (error) {
+        console.error("Error deleting link:", error);
+        res.status(500).json({ success: false, message: "Failed to delete link" });
+    }
+});
+
 if (test){
     app.get("/me",(req,res,next)=>{
         res.json(req.user)

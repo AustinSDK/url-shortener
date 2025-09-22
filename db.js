@@ -93,4 +93,7 @@ module.exports = class{
     getShortsByUsername(username){
         return this.db.prepare(`SELECT * FROM short_urls WHERE username = ?`).all(username)
     }
+    getShortsById(ID){
+        return this.db.prepare(`SELECT * FROM short_urls WHERE id = ?`).all(ID)
+    }
 }
