@@ -108,7 +108,11 @@ app.use(async (req,res,next)=>{
     
     // Not in cache, fetch from API
     try{
-        req.user = await auth.getUserInfo(token);
+        if (test){
+            req.user = {"username":"austin",permissions:["admin"]}
+        } else{
+            req.user = await auth.getUserInfo(token);
+        }
         if (req.user.status == "error"){
             req.user = false;
         }

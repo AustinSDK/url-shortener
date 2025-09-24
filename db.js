@@ -89,6 +89,11 @@ module.exports = class{
     removeShort(id){
         // First get the short URL to remove from cache
         const record = this.db.prepare(`SELECT short FROM short_urls WHERE id = ?`).get(id);
+        
+        // Delete related clicks first to avoid foreign key constraint
+        this.db.prepare(`DELETE FROM clicks WHERE short_url_id = ?`).run(id);
+        
+        // Then delete the short URL
         this.db.prepare(`DELETE FROM short_urls WHERE id = ?`).run(id);
         
         // Clear from cache
